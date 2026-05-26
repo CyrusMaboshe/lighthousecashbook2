@@ -1,0 +1,54 @@
+/* Responsive Breakpoints Quick Reference */
+
+/* ============================================
+   MOBILE (Default - Up to 767px)
+   ============================================ */
+
+Layout: - Full width container - Bottom navigation bar (horizontal) - Single column layouts - Vertical card stacks - FAB centered above bottom nav Action Grid: 2 columns Transaction List: Single column Navigation: Bottom bar with 4 items
+/* ============================================
+   TABLET (768px - 1023px)
+   ============================================ */
+
+Layout: - Centered container (600px max-width) - Still uses mobile-style bottom nav - Subtle shadows and borders - Slightly more breathing room Action Grid: 2 columns (same as mobile) Transaction List: Single column Navigation: Bottom bar (same as mobile)
+/* ============================================
+   DESKTOP (1024px - 1535px)
+   ============================================ */
+
+Layout: - Wide container (1400px max-width) - LEFT SIDEBAR navigation (280px) - Main content with 280px left margin - FAB in bottom-right corner - Multi-column layouts enabled Action Grid: 4 columns Transaction List: 2 columns Navigation: Vertical sidebar (left) Header: Full width with 3rem padding Main Content: 3rem horizontal padding
+/* ============================================
+   EXTRA LARGE DESKTOP (1536px+)
+   ============================================ */
+
+Layout: - Maximum width container (1600px) - Same sidebar structure - Even more generous spacing - Optimal for large monitors Action Grid: 6 columns Transaction List: 2 columns Navigation: Vertical sidebar (left) Main Content: 4rem horizontal padding
+/* ============================================
+   KEY CSS CLASSES FOR RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tailwind Breakpoint Prefixes:
+   - No prefix = Mobile (default)
+   - md: = Tablet (768px+)
+   - lg: = Desktop (1024px+)
+   - xl: = Large Desktop (1280px+)
+   - 2xl: = Extra Large (1536px+)
+*/
+
+/* Example Usage:
+   class="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6"
+   
+   This means:
+   - Mobile: 2 columns
+   - Tablet: 2 columns (no md: specified)
+   - Desktop: 4 columns (lg:)
+   - Extra Large: 6 columns (2xl:)
+*/
+
+/* Navigation Transformation:
+   Mobile: flex flex-col (vertical items in horizontal bar)
+   Desktop: lg:flex-row (horizontal items in vertical sidebar)
+*/
+
+/* Spacing Progression:
+   Mobile: p-4 (1rem)
+   Desktop: lg:p-8 (2rem)
+   Extra Large: 2xl:p-16 (4rem)
+*/

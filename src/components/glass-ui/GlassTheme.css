@@ -1,0 +1,3047 @@
+/* Glass Command Fintech Mobile - DARK GLASSMORPHISM Theme */
+
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+  /* Primary Colors - Neutral Silver/White for Apple Style */
+  --glass-primary: 214 32% 91%;
+  --glass-primary-glow: 214 32% 100%;
+  --glass-accent: 160 84% 45%;
+  --glass-danger: 0 84% 60%;
+  --glass-warning: 38 92% 50%;
+
+  /* Background Colors - DARK */
+  --glass-bg-dark: 222 47% 11%;
+  --glass-bg-darker: 222 47% 8%;
+
+  /* Surface Colors - DARK GLASS (Blue based) */
+  --glass-surface: 15 23 42 / 0.65;
+  --glass-surface-hover: 15 23 42 / 0.75;
+  --glass-surface-active: 15 23 42 / 0.85;
+
+  /* Text Colors - LIGHT for readability on dark */
+  --glass-text-primary: 0 0% 100%;
+  --glass-text-secondary: 214 32% 91%;
+  --glass-text-muted: 215 16% 65%;
+
+  /* Border Colors - Light transparent */
+  --glass-border: 0 0% 100% / 0.12;
+  --glass-border-hover: 0 0% 100% / 0.18;
+  --glass-border-glow: 0 0% 100% / 0.2;
+
+  /* Glow Effects - Enhanced for dark theme */
+  --glass-glow-blue: 0 8px 32px hsl(217 91% 60% / 0.3);
+  --glass-glow-cyan: 0 8px 32px hsl(199 89% 61% / 0.3);
+  --glass-glow-green: 0 8px 32px hsl(160 84% 39% / 0.3);
+
+  /* Spacing */
+  --glass-space-xs: 0.25rem;
+  --glass-space-sm: 0.5rem;
+  --glass-space-md: 1rem;
+  --glass-space-lg: 1.5rem;
+  --glass-space-xl: 2rem;
+  --glass-space-2xl: 3rem;
+
+  /* Border Radius */
+  --glass-radius-sm: 0.75rem;
+  --glass-radius-md: 1rem;
+  --glass-radius-lg: 1.25rem;
+  --glass-radius-xl: 1.5rem;
+  --glass-radius-2xl: 1.75rem;
+  --glass-radius-full: 9999px;
+
+  /* Blur */
+  --glass-blur-sm: 10px;
+  --glass-blur-md: 18px;
+  --glass-blur-lg: 30px;
+
+  /* Shadows - Dark theme */
+  --glass-shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-shadow-elevated: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --glass-shadow-glow: 0 8px 32px rgba(255, 255, 255, 0.1);
+
+  /* Apple Style Additions */
+  --apple-bg: #0f172a;
+  --apple-bg-color: #0f172a;
+  --apple-text: rgb(245, 245, 247);
+  --apple-accent: #517c9e;
+  --apple-transition: 0.5s;
+}
+
+/* ===== GLOBAL STYLES ===== */
+.glass-app {
+  background: linear-gradient(135deg, #0f172a 0%, #111827 50%, #0f172a 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--apple-color);
+  font-family: var(--apple-font, system-ui, -apple-system, sans-serif);
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar for the entire app */
+::-webkit-scrollbar {
+  width: 12px;
+  /* Slightly larger for easier tapping */
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Dark background with subtle monochromatic depth */
+.glass-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== GLASS CARD (Dark Glass) ===== */
+.glass-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--glass-radius-xl);
+  box-shadow: var(--glass-shadow-card);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  color: hsl(var(--glass-text-secondary));
+}
+
+.glass-card:hover {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: var(--glass-shadow-elevated);
+  transform: translateY(-2px);
+  color: hsl(var(--glass-text-primary));
+}
+
+.glass-card-glow {
+  box-shadow: var(--glass-shadow-card), var(--glass-shadow-glow);
+  border-color: hsl(var(--glass-border-glow));
+}
+
+.glass-card-static {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--glass-radius-xl);
+  box-shadow: var(--glass-shadow-card);
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  color: hsl(var(--glass-text-secondary));
+}
+
+/* ===== HEADER ===== */
+.glass-header {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1F2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 16px 20px;
+  width: 100%;
+}
+
+
+
+/* ===== BOTTOM NAV ===== */
+.glass-nav {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: auto !important;
+  padding: var(--glass-space-sm) var(--glass-space-md);
+  padding-bottom: max(var(--glass-space-sm), env(safe-area-inset-bottom));
+}
+
+/* ===== FAB ===== */
+.glass-fab {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, hsl(var(--glass-primary)) 0%, hsl(var(--glass-primary-glow)) 100%);
+  border-radius: var(--glass-radius-full);
+  border: 4px solid rgba(15, 23, 42, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px hsl(199 89% 48% / 0.4);
+  cursor: pointer;
+  z-index: 110 !important;
+  pointer-events: auto !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-fab:hover {
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 12px 40px rgba(255, 255, 255, 0.15);
+}
+
+.glass-fab:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* ===== BALANCE HERO CARD - APPLE STYLE ===== */
+.glass-balance-hero {
+  background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  color: var(--apple-color);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+  .glass-balance-hero {
+    padding: 2.25rem;
+    border-radius: 2.25rem;
+  }
+}
+
+.glass-balance-hero::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -30%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  opacity: 0.1;
+  filter: blur(60px);
+}
+
+/* ===== ACTION GRID ===== */
+.glass-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--glass-space-md);
+}
+
+.glass-action-card {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 1.75rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 120px;
+  justify-content: center;
+  color: var(--apple-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.glass-action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  /* Substrate highlight on blue */
+}
+
+.glass-action-card:active {
+  transform: scale(0.96);
+}
+
+/* ===== TRANSACTION LIST ===== */
+.glass-transaction-row {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--glass-radius-md);
+  padding: var(--glass-space-md);
+  margin-bottom: var(--glass-space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--glass-space-md);
+  transition: all 0.2s ease;
+  color: hsl(var(--glass-text-secondary));
+}
+
+.glass-transaction-row:hover {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: hsl(var(--glass-text-primary));
+}
+
+/* ===== BUTTONS ===== */
+.glass-btn {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--glass-radius-md);
+  padding: var(--glass-space-sm) var(--glass-space-md);
+  color: hsl(var(--glass-text-primary));
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.glass-btn:hover {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.glass-btn-primary {
+  background: linear-gradient(135deg, hsl(var(--glass-primary)) 0%, hsl(var(--glass-primary-glow)) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  box-shadow: 0 4px 16px hsl(199 89% 48% / 0.3);
+}
+
+.glass-btn-primary:hover {
+  box-shadow: 0 8px 24px hsl(199 89% 48% / 0.4);
+  transform: translateY(-2px);
+}
+
+.glass-btn-success {
+  background: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(160 84% 30%) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.glass-btn-danger {
+  background: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 84% 50%) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* ===== INPUTS ===== */
+.glass-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: var(--glass-radius-md);
+  padding: var(--glass-space-md);
+  color: hsl(var(--glass-text-primary)) !important;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: hsl(var(--glass-primary) / 0.5) !important;
+  box-shadow: 0 0 0 3px hsl(199 89% 48% / 0.15);
+}
+
+.glass-input::placeholder {
+  color: hsl(var(--glass-text-muted)) !important;
+}
+
+/* Themed Glass Inputs */
+.glass-input-success {
+  background: rgba(20, 40, 30, 0.6) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  color: white !important;
+  border-radius: var(--glass-radius-md);
+}
+
+.glass-input-success:focus {
+  background: rgba(20, 50, 35, 0.8) !important;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  outline: none;
+}
+
+.glass-input-danger {
+  background: rgba(50, 20, 20, 0.6) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: white !important;
+  border-radius: var(--glass-radius-md);
+}
+
+.glass-input-danger:focus {
+  background: rgba(60, 25, 25, 0.8) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  outline: none;
+}
+
+/* Custom Select Styling for Glass */
+.glass-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.glass-select-content {
+  background: rgba(20, 20, 25, 0.95) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: var(--glass-shadow-elevated);
+  border-radius: var(--glass-radius-md);
+  color: white !important;
+  z-index: 300 !important;
+  pointer-events: auto !important;
+  touch-action: pan-y !important;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.glass-select-item {
+  padding: 0.5rem 1rem;
+  border-radius: var(--glass-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.glass-select-item:hover,
+.glass-select-item[data-highlighted] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  outline: none;
+}
+
+
+/* ===== TYPOGRAPHY ===== */
+.glass-text-primary {
+  color: hsl(var(--glass-text-primary));
+}
+
+.glass-text-secondary {
+  color: hsl(var(--glass-text-secondary));
+}
+
+.glass-text-muted {
+  color: hsl(var(--glass-text-muted));
+}
+
+.glass-text-success {
+  color: hsl(160 84% 45%) !important;
+}
+
+.glass-text-danger {
+  color: hsl(0 84% 65%) !important;
+}
+
+/* .glass-text-glow removed as it was empty */
+
+/* ===== ANIMATIONS ===== */
+@keyframes glass-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glass-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glass-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.glass-animate-fade-in {
+  animation: glass-fade-in 0.4s ease-out;
+}
+
+.glass-animate-slide-up {
+  animation: glass-slide-up 0.3s ease-out;
+}
+
+.glass-animate-scale-in {
+  animation: glass-scale-in 0.2s ease-out;
+}
+
+/* ===== MOBILE APP CONTAINER ===== */
+.glass-mobile-container {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+}
+
+.glass-mobile-container main {
+  padding-top: 88px !important;
+}
+
+/* ===== RESPONSIVE DESKTOP LAYOUT ===== */
+
+/* Tablet: Slightly wider mobile view */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .glass-mobile-container {
+    max-width: 600px;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-app {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+}
+
+/* Desktop: Full responsive layout */
+@media (min-width: 1024px) {
+  .glass-mobile-container {
+    max-width: 1400px;
+    box-shadow: none;
+    border: none;
+  }
+
+  /* Desktop Header - Full width */
+  .glass-header {
+    padding: var(--glass-space-lg) var(--glass-space-2xl);
+  }
+
+  /* Desktop Main Content - Better spacing */
+  .glass-mobile-container main {
+    padding-left: var(--glass-space-2xl);
+    padding-right: var(--glass-space-2xl);
+    padding-bottom: var(--glass-space-2xl);
+    padding-top: 120px !important;
+  }
+
+  /* Desktop Bottom Nav - Convert to sidebar or hide */
+  .glass-nav {
+    position: fixed;
+    bottom: auto;
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 280px;
+    height: 100vh;
+    border-top: none;
+    border-right: 1px solid hsl(var(--glass-border));
+    flex-direction: column;
+    padding: var(--glass-space-md);
+    overflow-y: auto;
+    z-index: 100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-nav.collapsed {
+    width: 80px;
+    padding: var(--glass-space-md) var(--glass-space-xs);
+  }
+
+  .glass-nav.collapsed span {
+    display: none;
+  }
+
+  .glass-nav.collapsed button {
+    justify-content: center;
+    padding: var(--glass-space-sm);
+  }
+
+  /* Adjust main content for sidebar */
+  .glass-mobile-container main {
+    margin-left: 280px;
+    padding-bottom: var(--glass-space-2xl) !important;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-sidebar-collapsed .glass-mobile-container main {
+    margin-left: 80px;
+  }
+
+  /* Desktop Header */
+  .glass-header {
+    padding: var(--glass-space-lg) var(--glass-space-2xl);
+  }
+
+  /* Desktop FAB - Reposition or hide */
+  .glass-fab {
+    bottom: var(--glass-space-xl);
+    right: var(--glass-space-xl);
+    left: auto;
+    transform: none;
+  }
+
+  .glass-fab:hover {
+    transform: scale(1.1);
+  }
+
+  .glass-fab:active {
+    transform: scale(0.95);
+  }
+
+  /* Desktop Action Grid - More columns */
+  .glass-action-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--glass-space-lg);
+  }
+
+  /* Desktop Balance Hero - Larger */
+  .glass-balance-hero {
+    padding: var(--glass-space-2xl);
+  }
+
+  /* Desktop Transaction List - Multi-column option */
+  .glass-transaction-list-desktop {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--glass-space-md);
+  }
+
+  /* Desktop Cards - Better spacing */
+  .glass-card {
+    padding: var(--glass-space-lg);
+  }
+}
+
+/* Extra Large Desktop: Even more space */
+@media (min-width: 1536px) {
+  .glass-mobile-container {
+    max-width: 1600px;
+  }
+
+  .glass-action-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .glass-mobile-container main {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.glass-app ::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.glass-app ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-app ::-webkit-scrollbar-thumb {
+  background: hsl(var(--glass-border));
+  border-radius: 2px;
+}
+
+/* Custom Scrollbar with Arrows for Selects */
+.custom-scrollbar-with-arrows::-webkit-scrollbar {
+  width: 14px !important;
+  display: block !important;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-radius: 10px;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4) !important;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6) !important;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-button {
+  display: block !important;
+  height: 20px !important;
+  background-color: rgba(56, 189, 248, 0.2);
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 4px;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m18 15-6-6-6 6'/%3E%3C/svg%3E") !important;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+.custom-scrollbar-with-arrows::-webkit-scrollbar-button:hover {
+  background-color: rgba(56, 189, 248, 0.5) !important;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.glass-p-xs {
+  padding: var(--glass-space-xs);
+}
+
+.glass-p-sm {
+  padding: var(--glass-space-sm);
+}
+
+.glass-p-md {
+  padding: var(--glass-space-md);
+}
+
+.glass-p-lg {
+  padding: var(--glass-space-lg);
+}
+
+.glass-p-xl {
+  padding: var(--glass-space-xl);
+}
+
+.glass-rounded-sm {
+  border-radius: var(--glass-radius-sm);
+}
+
+.glass-rounded-md {
+  border-radius: var(--glass-radius-md);
+}
+
+.glass-rounded-lg {
+  border-radius: var(--glass-radius-lg);
+}
+
+.glass-rounded-xl {
+  border-radius: var(--glass-radius-xl);
+}
+
+.glass-rounded-full {
+  border-radius: var(--glass-radius-full);
+}
+
+/* Hide content for non-admin users */
+.glass-admin-only {
+  display: none;
+}
+
+.glass-is-admin .glass-admin-only {
+  display: block;
+}
+
+/* ===== OVERRIDE LEGACY COMPONENTS ===== */
+.glass-view-content .bg-white,
+.glass-view-content .bg-gray-50,
+.glass-view-content .bg-slate-50,
+.glass-view-content [class*="bg-card"] {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+}
+
+.glass-view-content .bg-red-50,
+.glass-view-content .bg-green-50,
+.glass-view-content .bg-blue-50,
+.glass-view-content .bg-yellow-50,
+.glass-view-content .bg-orange-50,
+.glass-view-content .bg-purple-50 {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-radius: 12px !important;
+}
+
+.glass-view-content .text-gray-900,
+.glass-view-content .text-slate-900,
+.glass-view-content .text-slate-800,
+.glass-view-content .text-gray-800,
+.glass-view-content .text-black,
+.glass-view-content [class*="text-foreground"] {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.glass-view-content .text-gray-700,
+.glass-view-content .text-slate-700,
+.glass-view-content .text-gray-600,
+.glass-view-content .text-gray-500,
+.glass-view-content .text-slate-600,
+.glass-view-content .text-slate-500,
+.glass-view-content [class*="text-muted"] {
+  color: rgba(148, 163, 184, 0.9) !important;
+}
+
+.glass-view-content .border,
+.glass-view-content .border-gray-200,
+.glass-view-content .border-slate-200,
+.glass-view-content .border-gray-100,
+.glass-view-content .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.glass-view-content input,
+.glass-view-content select,
+.glass-view-content textarea {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  border-radius: 12px !important;
+}
+
+.glass-view-content input::placeholder,
+.glass-view-content textarea::placeholder {
+  color: rgba(148, 163, 184, 0.5) !important;
+}
+
+.glass-view-content button:not(.glass-btn-primary) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.glass-view-content table {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-view-content th {
+  background: rgba(15, 23, 42, 0.4) !important;
+  color: rgba(148, 163, 184, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.glass-view-content td {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.glass-view-content tr:hover td {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Tabs inside reports */
+.glass-view-content [role="tablist"] {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+}
+
+.glass-view-content [role="tab"] {
+  color: rgba(148, 163, 184, 0.8) !important;
+  border-radius: 8px !important;
+}
+
+.glass-view-content [role="tab"][data-state="active"] {
+  background: rgba(37, 99, 235, 0.2) !important;
+  color: rgba(96, 165, 250, 1) !important;
+}
+
+/* Cards and shadows */
+.glass-view-content .shadow-sm,
+.glass-view-content .shadow-md,
+.glass-view-content .shadow-lg {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Badge overrides */
+.glass-view-content .badge,
+.glass-view-content [class*="bg-green-100"],
+.glass-view-content [class*="bg-red-100"],
+.glass-view-content [class*="bg-blue-100"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+}
+
+/* Smooth transitions for wrapped components */
+.glass-view-content > * {
+  animation: glassViewFadeIn 0.4s ease-out;
+}
+
+@keyframes glassViewFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== FINANCIAL COLOR LOGIC ===== */
+/* Green for positive/deposits, Red for negative/withdrawals */
+.glass-view-content .text-green-600,
+.glass-view-content .text-green-500,
+.glass-view-content .text-green-400,
+.glass-view-content .text-green-700,
+.glass-view-content .text-emerald-600,
+.glass-view-content .text-emerald-500,
+.glass-view-content .text-emerald-400 {
+  color: hsl(160 84% 45%) !important;
+}
+
+.glass-view-content .text-red-600,
+.glass-view-content .text-red-500,
+.glass-view-content .text-red-400,
+.glass-view-content .text-red-700,
+.glass-view-content .text-rose-600,
+.glass-view-content .text-rose-500,
+.glass-view-content .text-rose-400 {
+  color: hsl(0 84% 65%) !important;
+}
+
+/* Financial amount utility classes */
+.glass-amount-positive {
+  color: hsl(160 84% 45%) !important;
+  font-weight: 600;
+}
+
+.glass-amount-negative {
+  color: hsl(0 84% 65%) !important;
+  font-weight: 600;
+}
+
+/* ===== MOBILE OPTIMIZATION FOR REPORT TABS ===== */
+@media (max-width: 768px) {
+  /* Force all report content to fit mobile width */
+  .glass-view-content {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+  }
+
+  .glass-view-content > * {
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+
+  /* Cards: compact on mobile */
+  .glass-view-content .bg-white,
+  .glass-view-content .bg-gray-50,
+  .glass-view-content .bg-slate-50,
+  .glass-view-content [class*="bg-card"] {
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Tables: scrollable horizontally on mobile */
+  .glass-view-content .overflow-x-auto,
+  .glass-view-content table {
+    display: block;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  .glass-view-content table {
+    min-width: 100%;
+    font-size: 0.75rem !important;
+  }
+
+  .glass-view-content th,
+  .glass-view-content td {
+    padding: 0.5rem 0.4rem !important;
+    font-size: 0.72rem !important;
+    white-space: nowrap;
+  }
+
+  /* Typography scaling for mobile */
+  .glass-view-content h1 {
+    font-size: 1.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .glass-view-content h2 {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .glass-view-content h3 {
+    font-size: 0.95rem !important;
+  }
+
+  .glass-view-content p {
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Tab list: scrollable on mobile */
+  .glass-view-content [role="tablist"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    display: flex !important;
+    gap: 2px !important;
+    padding: 3px !important;
+    scrollbar-width: none;
+  }
+
+  .glass-view-content [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-view-content [role="tab"] {
+    font-size: 0.7rem !important;
+    padding: 0.35rem 0.6rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: auto !important;
+  }
+
+  /* Grid layouts: stack on mobile */
+  .glass-view-content .grid-cols-2,
+  .glass-view-content .md\:grid-cols-2,
+  .glass-view-content .lg\:grid-cols-2,
+  .glass-view-content .grid-cols-3,
+  .glass-view-content .md\:grid-cols-3,
+  .glass-view-content .lg\:grid-cols-3,
+  .glass-view-content .grid-cols-4,
+  .glass-view-content .md\:grid-cols-4,
+  .glass-view-content .lg\:grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Allow 2-col for stat cards */
+  .glass-view-content .grid-cols-2:not([role="tablist"]) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Buttons: proper sizing for touch */
+  .glass-view-content button {
+    min-height: 36px;
+    font-size: 0.78rem !important;
+  }
+
+  /* Inputs: proper sizing */
+  .glass-view-content input,
+  .glass-view-content select,
+  .glass-view-content textarea {
+    font-size: 0.85rem !important;
+    min-height: 40px;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  /* Select dropdowns */
+  .glass-view-content [role="combobox"],
+  .glass-view-content .glass-select-trigger {
+    font-size: 0.8rem !important;
+    padding: 0.4rem 0.6rem !important;
+  }
+
+  /* Spacing fixes */
+  .glass-view-content .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .glass-view-content .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .glass-view-content .gap-6 {
+    gap: 0.75rem !important;
+  }
+
+  .glass-view-content .gap-4 {
+    gap: 0.5rem !important;
+  }
+
+  .glass-view-content .p-6 {
+    padding: 0.75rem !important;
+  }
+
+  .glass-view-content .p-4 {
+    padding: 0.6rem !important;
+  }
+
+  /* Flex layouts: wrap on mobile */
+  .glass-view-content .flex-row {
+    flex-wrap: wrap !important;
+  }
+
+  /* Badge sizing */
+  .glass-view-content .badge,
+  .glass-view-content [class*="bg-green-100"],
+  .glass-view-content [class*="bg-red-100"],
+  .glass-view-content [class*="bg-blue-100"] {
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  /* Chart containers: contain width */
+  .glass-view-content .recharts-wrapper,
+  .glass-view-content canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Dialog/Modal mobile full width */
+  .glass-view-content [role="dialog"] {
+    max-width: calc(100vw - 2rem) !important;
+    margin: 0 auto;
+  }
+}
+
+/* ===== SMALL PHONE OPTIMIZATION (Tecno Spark 4, etc.) ===== */
+@media (max-width: 380px) {
+  .glass-view-content h1 {
+    font-size: 1.1rem !important;
+  }
+
+  .glass-view-content h2 {
+    font-size: 0.95rem !important;
+  }
+
+  .glass-view-content [role="tab"] {
+    font-size: 0.65rem !important;
+    padding: 0.3rem 0.5rem !important;
+  }
+
+  .glass-view-content th,
+  .glass-view-content td {
+    padding: 0.35rem 0.3rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .glass-view-content .grid-cols-2:not([role="tablist"]) {
+    grid-template-columns: 1fr !important;
+  }
+
+  .glass-header {
+    padding: 0.75rem 0.5rem !important;
+  }
+}
+
+/* ===== HEADER MOBILE DATE OPTIMIZATION ===== */
+@media (max-width: 480px) {
+  .glass-header .flex.items-center.gap-2 span {
+    font-size: 9px !important;
+  }
+
+  .glass-header .flex.items-center.gap-2 {
+    gap: 0.25rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+}
+
+/* ===== PREMIUM REDESIGN UTILITIES ===== */
+.glass-mesh-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: hsl(var(--glass-bg-light));
+}
+
+.glass-mesh-gradient::before,
+.glass-mesh-gradient::after,
+.glass-mesh-blob {
+  content: '';
+  position: absolute;
+  width: 50vw;
+  height: 50vw;
+  filter: blur(100px);
+  opacity: 0.15;
+  border-radius: var(--glass-radius-full);
+  z-index: -1;
+  animation: mesh-float 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.glass-mesh-gradient::before {
+  top: -10%;
+  left: -10%;
+  background: hsl(var(--glass-primary));
+  animation-duration: 25s;
+}
+
+.glass-mesh-gradient::after {
+  bottom: -10%;
+  right: -10%;
+  background: hsl(var(--glass-primary-glow));
+  animation-duration: 30s;
+  animation-delay: -5s;
+}
+
+.glass-mesh-blob-1 {
+  top: 40%;
+  left: 30%;
+  background: hsl(160 84% 39%);
+  width: 30vw;
+  height: 30vw;
+  animation-duration: 18s;
+  animation-delay: -2s;
+}
+
+.glass-mesh-blob-2 {
+  bottom: 20%;
+  left: 10%;
+  background: hsl(38 92% 50%);
+  width: 25vw;
+  height: 25vw;
+  animation-duration: 22s;
+}
+
+@keyframes mesh-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  33% {
+    transform: translate(5%, 10%) rotate(10deg) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-5%, 5%) rotate(-10deg) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.glass-panel-ultra {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 8px 32px 0 rgba(31, 38, 135, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.glass-input-premium {
+  background: rgba(255, 255, 255, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-input-premium:focus {
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: hsl(var(--glass-primary) / 0.5) !important;
+  box-shadow: 0 0 0 4px hsl(var(--glass-primary) / 0.1) !important;
+  transform: translateY(-1px);
+}
+
+.glass-text-premium {
+  background: linear-gradient(135deg, hsl(var(--glass-text-primary)) 0%, hsl(var(--glass-text-secondary)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== CLOUDY SPLIT LOGIN REDESIGN (MATCHING NEW REFERENCE) ===== */
+
+.split-login-root {
+  min-height: 100vh;
+  display: flex;
+  background: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* LEFT SIDE - BRANDING & QUOTES */
+.split-login-left {
+  flex: 0 0 45%;
+  background: linear-gradient(135deg, #1e62d0 0%, #36a5ff 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.split-login-left-content {
+  max-width: 450px;
+  text-align: center;
+  z-index: 5;
+}
+
+.split-login-welcome {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.split-login-logo-wrap {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.split-login-logo-circle {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e62d0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.split-login-logo-svg {
+  width: 60px;
+  height: 60px;
+}
+
+.split-login-brand {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.split-login-quote-box {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.split-login-quote {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  font-style: italic;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* CLOUD DIVIDER */
+.split-login-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -80px;
+  width: 100px;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M0 0 c 50 50, 100 100, 50 150 c -50 50, 0 100, 50 150 c 50 50, 0 100, -50 150 c -50 50, 50 100, 50 150 c 0 50, -50 100, -50 150 c 0 50, 100 100, 50 150 c -50 50, -50 100, 0 150 L 0 1000 Z' fill='%2336a5ff'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  z-index: 10;
+}
+
+/* ADDITIONAL DECORATIVE CLOUDS */
+.cloud-accent-1 {
+  position: absolute;
+  top: 10%;
+  right: -120px;
+  width: 250px;
+  height: 250px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(40px);
+  z-index: 1;
+}
+
+.cloud-accent-2 {
+  position: absolute;
+  bottom: 15%;
+  right: -80px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  filter: blur(30px);
+  z-index: 1;
+}
+
+/* RIGHT SIDE - FORM */
+.split-login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+  background: white;
+  z-index: 5;
+}
+
+.split-login-form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.split-login-header {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.split-login-input-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.split-login-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.split-login-input {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-bottom: 2px solid #e0e0e0;
+  background: transparent;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.split-login-input:focus {
+  outline: none;
+  border-bottom-color: #1e62d0;
+}
+
+.split-login-input::placeholder {
+  color: #ccc;
+}
+
+.split-login-actions {
+  margin-top: 3rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.split-login-btn-primary {
+  flex: 1;
+  height: 50px;
+  background: #1e62d0;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(30, 98, 208, 0.3);
+  transition: all 0.3s ease;
+}
+
+.split-login-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(30, 98, 208, 0.4);
+  background: #1656c0;
+}
+
+.split-login-btn-secondary {
+  flex: 1;
+  height: 50px;
+  background: white;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.split-login-btn-secondary:hover {
+  background: #f9f9f9;
+  border-color: #ccc;
+}
+
+/* MOBILE SPECIFIC */
+@media (max-width: 1024px) {
+  .split-login-root {
+    flex-direction: column;
+  }
+
+  .split-login-left {
+    display: none;
+    /* Hide welcome panel on form-first mobile view */
+  }
+
+  .split-login-right {
+    padding: 2rem;
+    position: relative;
+    padding-top: 200px;
+  }
+
+  /* Add blue cloud header for mobile form view (Image 3) */
+  .split-login-right::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #1e62d0 0%, #36a5ff 100%);
+    z-index: -1;
+  }
+
+  /* Cloud border at bottom of blue header */
+  .split-login-right::after {
+    content: '';
+    position: absolute;
+    top: 150px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100 C 100 0, 200 0, 300 100 C 400 0, 500 0, 600 100 C 700 0, 800 0, 900 100 L 1000 100 L 1000 0 L 0 0 Z' fill='%2336a5ff'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    z-index: 10;
+  }
+
+  /* Mobile logo in the blue header */
+  .mobile-logo-header {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: white;
+  }
+
+  .mobile-logo-img {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1e62d0;
+  }
+}
+
+/* To maintain responsiveness if user wants to see the welcome slide first on mobile,
+   we'll add a state class later, but for now we follow: 
+   "ensure the third design (far end) is the first visible slide on mobile." */
+
+/* ===== AURORA MOBILE DESIGN (PREMIUM REDESIGN) ===== */
+
+.aurora-login-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #020617;
+  /* Slate 950 base */
+  position: relative;
+  overflow: hidden;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 1.5rem;
+}
+
+/* Stunning Animated Aurora Background */
+.aurora-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.aurora-mesh {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image:
+    radial-gradient(circle at 70% 30%, #4338ca 0%, transparent 40%),
+    radial-gradient(circle at 30% 70%, #0369a1 0%, transparent 40%),
+    radial-gradient(circle at 10% 10%, #6d28d9 0%, transparent 35%),
+    radial-gradient(circle at 90% 90%, #0d9488 0%, transparent 35%);
+  filter: blur(100px);
+  opacity: 0.6;
+  animation: aurora-float 25s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-float {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: translate(-5%, 5%) rotate(90deg) scale(1.15);
+  }
+
+  100% {
+    transform: translate(5%, -5%) rotate(180deg) scale(1.05);
+  }
+}
+
+/* Premium Glass Card */
+.aurora-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2.5rem;
+  padding: 3.5rem 2rem;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+/* Typography */
+.aurora-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(to bottom right, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.aurora-subtitle {
+  color: #94a3b8;
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 3rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Inputs */
+.aurora-field-group {
+  margin-bottom: 1.75rem;
+}
+
+.aurora-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6366f1;
+  /* Indigo 500 */
+  margin-bottom: 0.75rem;
+  margin-left: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.aurora-input-wrap {
+  position: relative;
+}
+
+.aurora-input {
+  width: 100%;
+  height: 64px !important;
+  background: rgba(30, 41, 59, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1.25rem !important;
+  padding: 0 1.5rem !important;
+  color: white !important;
+  font-size: 1rem !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.aurora-input:focus {
+  outline: none !important;
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+.aurora-input::placeholder {
+  color: #475569 !important;
+  opacity: 0.6;
+}
+
+/* Button */
+.aurora-btn {
+  width: 100%;
+  height: 64px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 1.25rem;
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 15px 35px -10px rgba(79, 70, 229, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.aurora-btn:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 20px 45px -10px rgba(79, 70, 229, 0.6);
+  filter: brightness(1.1);
+}
+
+.aurora-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.aurora-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Decor Blobs */
+.aurora-blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aurora-blob-1 {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: blob-float-large 30s ease-in-out infinite;
+}
+
+.aurora-blob-2 {
+  position: absolute;
+  bottom: -15%;
+  right: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: blob-float-large 35s ease-in-out infinite reverse;
+}
+
+@keyframes blob-float-large {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(10%, -10%) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-5%, 15%) scale(0.9);
+  }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 1023px) {
+  .split-login-root {
+    display: none !important;
+  }
+
+  .aurora-login-root {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .aurora-login-root {
+    display: none !important;
+  }
+}
+
+/* ======================================================
+   LIGHT MODE THEME — applied when html has .glass-light-mode
+   ====================================================== */
+.glass-light-mode {
+  --glass-text-primary: 222 47% 11%;
+  --glass-text-secondary: 222 47% 20%;
+  --glass-text-muted: 215 16% 45%;
+  --glass-border: 210 20% 70% / 0.6;
+  --glass-border-hover: 210 20% 60% / 0.8;
+  --glass-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --glass-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.10);
+  --apple-bg: #F5F7FA;
+  --apple-bg-color: #F5F7FA;
+  --apple-text: #0F172A;
+
+  /* Override Tailwind CSS variables for light mode */
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --muted: 210 40% 98.4%;
+  --muted-foreground: 215 20% 40%;
+  --border: 214 32% 91%;
+}
+
+/* ===== APP BACKGROUND ===== */
+.glass-light-mode .glass-app {
+  background: #F5F7FA !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-app::before {
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.03) 0%, transparent 50%) !important;
+}
+
+/* ===== BODY/MOBILE BACKGROUND OVERRIDE ===== */
+.glass-light-mode body {
+  background: #F5F7FA !important;
+}
+
+.glass-light-mode .mobile-container,
+.glass-light-mode .mobile-card,
+.glass-light-mode .mobile-action-button,
+.glass-light-mode .mobile-balance-card,
+.glass-light-mode .mobile-transaction-item {
+  background: #FFFFFF !important;
+}
+
+.glass-light-mode .mobile-header,
+.glass-light-mode .mobile-header-modern,
+.glass-light-mode .mobile-nav,
+.glass-light-mode .mobile-bottom-nav {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* ===== GLASS CARDS — White clean premium cards ===== */
+.glass-light-mode .glass-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E7EBF0 !important;
+  color: #0F172A !important;
+  box-shadow: 0px 8px 24px rgba(15, 23, 42, 0.06) !important;
+  border-radius: 18px !important;
+}
+
+.glass-light-mode .glass-card:hover {
+  background: #FFFFFF !important;
+  border-color: #CBD5E1 !important;
+  box-shadow: 0px 12px 32px rgba(15, 23, 42, 0.10) !important;
+  transform: translateY(-2px) !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-card-static {
+  background: #FFFFFF;
+  border: 1px solid #E7EBF0;
+  color: #0F172A;
+  box-shadow: 0px 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* ===== HEADER ===== */
+.glass-light-mode .glass-header {
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #E7EBF0;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+/* ===== BOTTOM NAV / SIDEBAR ===== */
+.glass-light-mode .glass-nav {
+  background: rgba(255, 255, 255, 0.98);
+  border-top: 1px solid #E7EBF0;
+  border-right: 1px solid #E7EBF0;
+  box-shadow: 0 -2px 16px rgba(15, 23, 42, 0.06);
+}
+
+/* ===== ACTION CARDS ===== */
+.glass-light-mode .glass-action-card {
+  background: #FFFFFF;
+  border: 1px solid #E7EBF0;
+  color: #0F172A;
+  box-shadow: 0px 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.glass-light-mode .glass-action-card:hover {
+  background: #FAFBFC;
+  border-color: #CBD5E1;
+  box-shadow: 0px 8px 24px rgba(15, 23, 42, 0.10);
+  transform: translateY(-2px);
+}
+
+/* ===== TRANSACTION ROWS ===== */
+.glass-light-mode .glass-transaction-row {
+  background: #FFFFFF;
+  border: 1px solid #E7EBF0;
+  color: #0F172A;
+  box-shadow: 0px 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.glass-light-mode .glass-transaction-row:hover {
+  background: #FAFBFC;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+/* ===== BALANCE HERO - PREMIUM GREY DESIGN (LIGHT MODE) ===== */
+.glass-light-mode .glass-balance-hero {
+  background: linear-gradient(165deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 
+    0 20px 40px rgba(15, 23, 42, 0.08), 
+    0 1px 1px rgba(255, 255, 255, 1) inset,
+    0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-light-mode .glass-balance-hero::before {
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.02) 0%, transparent 50%) !important;
+  opacity: 0.5 !important;
+}
+
+.glass-light-mode .glass-balance-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 70%);
+  transform: translateX(-100%);
+  animation: glass-shimmer-hero 6s infinite;
+  pointer-events: none;
+}
+
+@keyframes glass-shimmer-hero {
+  0% { transform: translateX(-100%); }
+  20%, 100% { transform: translateX(100%); }
+}
+
+/* Override text colors inside hero for premium slate contrast */
+.glass-light-mode .glass-balance-hero .text-white\/40,
+.glass-light-mode .glass-balance-hero span[class*="text-white/40"] {
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+}
+
+.glass-light-mode .glass-balance-hero .text-white\/30,
+.glass-light-mode .glass-balance-hero span[class*="text-white/30"] {
+  color: #CBD5E1 !important;
+  opacity: 1 !important;
+}
+
+.glass-light-mode .glass-balance-hero .text-white\/70 {
+  color: #475569 !important;
+}
+
+.glass-light-mode .glass-balance-hero .bg-white\/10 {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+.glass-light-mode .glass-balance-hero .bg-white\/5 {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* ===== FAB BUTTON ===== */
+.glass-light-mode .glass-fab {
+  background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+}
+
+/* ===== BUTTONS ===== */
+.glass-light-mode .glass-btn {
+  background: #FFFFFF;
+  border: 1px solid #E7EBF0;
+  color: #0F172A;
+  box-shadow: 0px 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+.glass-light-mode .glass-btn:hover {
+  background: #FAFBFC;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+/* ===== INPUTS ===== */
+.glass-light-mode .glass-input,
+.glass-light-mode input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.glass-light-mode select,
+.glass-light-mode textarea {
+  background: #FFFFFF !important;
+  border: 1px solid #E7EBF0 !important;
+  color: #0F172A !important;
+  border-radius: 14px;
+  min-height: 44px;
+}
+
+.glass-light-mode .glass-input:focus,
+.glass-light-mode input:not([type="checkbox"]):not([type="radio"]):focus,
+.glass-light-mode select:focus,
+.glass-light-mode textarea:focus {
+  background: #FFFFFF !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  outline: none !important;
+}
+
+.glass-light-mode .glass-input::placeholder,
+.glass-light-mode input::placeholder,
+.glass-light-mode textarea::placeholder {
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+}
+
+/* ===== SCROLLBAR ===== */
+.glass-light-mode .glass-app ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.glass-light-mode ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+.glass-light-mode ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+
+.glass-light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ===== COMPREHENSIVE TEXT COLOR OVERRIDES ===== */
+/* Fix all white text in light mode */
+.glass-light-mode .text-white {
+  color: #0F172A !important;
+}
+
+.glass-light-mode .text-white\/90 {
+  color: rgba(15, 23, 42, 0.9) !important;
+}
+
+.glass-light-mode .text-white\/80 {
+  color: rgba(15, 23, 42, 0.8) !important;
+}
+
+.glass-light-mode .text-white\/70 {
+  color: rgba(15, 23, 42, 0.7) !important;
+}
+
+.glass-light-mode .text-white\/60 {
+  color: rgba(15, 23, 42, 0.6) !important;
+}
+
+.glass-light-mode .text-white\/50 {
+  color: #64748B !important;
+}
+
+.glass-light-mode .text-white\/40 {
+  color: #94A3B8 !important;
+}
+
+.glass-light-mode .text-white\/30 {
+  color: #CBD5E1 !important;
+}
+
+.glass-light-mode .text-white\/20,
+.glass-light-mode .text-white\/10,
+.glass-light-mode .text-white\/5 {
+  color: #E2E8F0 !important;
+}
+
+/* Fix slate text colors */
+.glass-light-mode .text-slate-400 {
+  color: #64748B !important;
+}
+
+.glass-light-mode .text-slate-500 {
+  color: #475569 !important;
+}
+
+.glass-light-mode .text-slate-300 {
+  color: #64748B !important;
+}
+
+.glass-light-mode .text-slate-200 {
+  color: #475569 !important;
+}
+
+.glass-light-mode .text-slate-800,
+.glass-light-mode .text-slate-600 {
+  color: #334155 !important;
+}
+
+/* ===== TRANSACTION VIEW CARD BACKGROUNDS ===== */
+/* Dark gradient backgrounds in transaction summary cards → light equivalents */
+.glass-light-mode .bg-gradient-to-br.from-green-900\/30,
+.glass-light-mode [class*="from-green-900/"] {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.08) 0%, rgba(22, 163, 74, 0.04) 100%) !important;
+  border-color: rgba(22, 163, 74, 0.2) !important;
+}
+
+.glass-light-mode .bg-gradient-to-br.from-red-900\/30,
+.glass-light-mode [class*="from-red-900/"] {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, rgba(220, 38, 38, 0.04) 100%) !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+.glass-light-mode .bg-gradient-to-br.from-blue-900\/30,
+.glass-light-mode [class*="from-blue-900/"] {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.glass-light-mode .bg-gradient-to-br.from-emerald-900\/30,
+.glass-light-mode [class*="from-emerald-900/"] {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%) !important;
+  border-color: rgba(5, 150, 105, 0.2) !important;
+}
+
+/* Dark bg glass transaction action buttons */
+.glass-light-mode [class*="from-green-900/40"],
+.glass-light-mode [class*="from-green-900/30"] {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.10) 0%, rgba(22, 163, 74, 0.06) 100%) !important;
+  border-color: rgba(22, 163, 74, 0.3) !important;
+}
+
+.glass-light-mode [class*="from-red-900/40"],
+.glass-light-mode [class*="from-red-900/30"] {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.10) 0%, rgba(220, 38, 38, 0.06) 100%) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Fix light text on these card backgrounds */
+.glass-light-mode .text-green-100,
+.glass-light-mode .text-green-200,
+.glass-light-mode .text-green-300,
+.glass-light-mode .text-green-300\/80 {
+  color: #15803D !important;
+}
+
+.glass-light-mode .text-red-100,
+.glass-light-mode .text-red-200,
+.glass-light-mode .text-red-300,
+.glass-light-mode .text-red-300\/80 {
+  color: #B91C1C !important;
+}
+
+.glass-light-mode .text-blue-200,
+.glass-light-mode .text-blue-300 {
+  color: #1D4ED8 !important;
+}
+
+.glass-light-mode .text-emerald-200,
+.glass-light-mode .text-emerald-300 {
+  color: #065F46 !important;
+}
+
+.glass-light-mode .text-indigo-200,
+.glass-light-mode .text-indigo-300,
+.glass-light-mode .text-indigo-300\/80 {
+  color: #3730A3 !important;
+}
+
+/* Keep vibrant financial colors */
+.glass-light-mode .text-green-400,
+.glass-light-mode .glass-text-success {
+  color: #16A34A !important;
+}
+
+.glass-light-mode .text-red-400,
+.glass-light-mode .glass-text-danger {
+  color: #DC2626 !important;
+}
+
+.glass-light-mode .text-indigo-400 {
+  color: #4F46E5 !important;
+}
+
+.glass-light-mode .text-blue-400 {
+  color: #2563EB !important;
+}
+
+.glass-light-mode .text-emerald-400 {
+  color: #059669 !important;
+}
+
+/* ===== DATE SEPARATOR HEADINGS ===== */
+.glass-light-mode h4.text-sm.font-semibold.text-white\/80 {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+.glass-light-mode span.text-xs.text-white\/50 {
+  color: #64748B !important;
+}
+
+.glass-light-mode .flex-1.h-px.bg-white\/10 {
+  background: #E7EBF0 !important;
+}
+
+/* ===== TRANSACTION LIST HEADINGS ===== */
+.glass-light-mode h3.text-lg.font-semibold.text-white\/90,
+.glass-light-mode h3.text-xl.font-bold.tracking-tight.text-white\/90 {
+  color: #0F172A !important;
+}
+
+/* ===== NAVIGATION BOTTOM NAV ITEMS ===== */
+.glass-light-mode .glass-nav button.text-slate-400,
+.glass-light-mode .glass-nav button {
+  color: #64748B;
+}
+
+.glass-light-mode .glass-nav button:hover {
+  color: #0F172A;
+  background: rgba(37, 99, 235, 0.08) !important;
+}
+
+.glass-light-mode .glass-nav button.text-white,
+.glass-light-mode .glass-nav button [class*="text-white"] {
+  color: #0F172A !important;
+}
+
+/* Active nav item */
+.glass-light-mode .glass-nav [class*="bg-blue-600/20"] {
+  background: rgba(37, 99, 235, 0.10) !important;
+  border-color: rgba(37, 99, 235, 0.20) !important;
+}
+
+/* Fix nav item background: bg-[#0f172a]/40 → light */
+.glass-light-mode [class*="bg-[#0f172a]/"] {
+  background: rgba(241, 245, 249, 0.8) !important;
+}
+
+/* Fix border-white/5, border-white/10 */
+.glass-light-mode .border-white\/5 {
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .border-white\/10 {
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .border-white\/12 {
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .border-white\/20 {
+  border-color: #CBD5E1 !important;
+}
+
+/* Nav company name */
+.glass-light-mode .glass-nav h1 {
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-nav p {
+  color: #64748B !important;
+}
+
+/* Collapse border */
+.glass-light-mode .border-t.border-white\/5 {
+  border-color: #E7EBF0 !important;
+}
+
+/* ===== TRANSACTION SEARCH BAR ===== */
+.glass-light-mode .mobile-search-bar {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+/* ===== FILTER SECTION ===== */
+.glass-light-mode [class*="border-t"][class*="border-white/10"] {
+  border-color: #E7EBF0 !important;
+}
+
+/* Filter label */
+.glass-light-mode label.text-xs.text-slate-300 {
+  color: #64748B !important;
+}
+
+/* Active period box */
+.glass-light-mode .px-3.py-2.rounded-lg.bg-violet-500\/10 {
+  background: rgba(124, 58, 237, 0.06) !important;
+  border-color: rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Violet text */
+.glass-light-mode .text-violet-300 {
+  color: #7C3AED !important;
+}
+
+/* Type filter buttons (inactive) */
+.glass-light-mode [class*="bg-white/5"].text-slate-300 {
+  background: #F1F5F9 !important;
+  color: #475569 !important;
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode [class*="bg-white/5"]:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Filter period active period text */
+.glass-light-mode p.text-sm.font-semibold.text-white {
+  color: #0F172A !important;
+}
+
+/* ===== GLASS VIEW CONTENT — Sub-tab content areas ===== */
+.glass-light-mode .glass-view-content .bg-white,
+.glass-light-mode .glass-view-content .bg-gray-50,
+.glass-light-mode .glass-view-content .bg-slate-50,
+.glass-light-mode .glass-view-content [class*="bg-card"] {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  backdrop-filter: none !important;
+}
+
+.glass-light-mode .glass-view-content .bg-red-50,
+.glass-light-mode .glass-view-content .bg-green-50,
+.glass-light-mode .glass-view-content .bg-blue-50,
+.glass-light-mode .glass-view-content .bg-yellow-50,
+.glass-light-mode .glass-view-content .bg-orange-50,
+.glass-light-mode .glass-view-content .bg-purple-50 {
+  background: inherit !important;
+}
+
+.glass-light-mode .glass-view-content .text-gray-900,
+.glass-light-mode .glass-view-content .text-slate-900,
+.glass-light-mode .glass-view-content .text-slate-800,
+.glass-light-mode .glass-view-content .text-gray-800,
+.glass-light-mode .glass-view-content .text-black,
+.glass-light-mode .glass-view-content [class*="text-foreground"] {
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-view-content .text-gray-700,
+.glass-light-mode .glass-view-content .text-slate-700,
+.glass-light-mode .glass-view-content .text-gray-600,
+.glass-light-mode .glass-view-content .text-gray-500,
+.glass-light-mode .glass-view-content .text-slate-600,
+.glass-light-mode .glass-view-content .text-slate-500,
+.glass-light-mode .glass-view-content [class*="text-muted"] {
+  color: #64748B !important;
+}
+
+.glass-light-mode .glass-view-content .border,
+.glass-light-mode .glass-view-content .border-gray-200,
+.glass-light-mode .glass-view-content .border-slate-200,
+.glass-light-mode .glass-view-content .border-gray-100,
+.glass-light-mode .glass-view-content .border-slate-100 {
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .glass-view-content input,
+.glass-light-mode .glass-view-content select,
+.glass-light-mode .glass-view-content textarea {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-view-content input::placeholder,
+.glass-light-mode .glass-view-content textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+.glass-light-mode .glass-view-content th {
+  background: #F8FAFC !important;
+  color: #64748B !important;
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .glass-view-content td {
+  border-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-view-content tr:hover td {
+  background: #F8FAFC !important;
+}
+
+/* Tabs - reports/inner views */
+.glass-light-mode .glass-view-content [role="tablist"] {
+  background: #F1F5F9 !important;
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .glass-view-content [role="tab"] {
+  color: #64748B !important;
+}
+
+.glass-light-mode .glass-view-content [role="tab"][data-state="active"] {
+  background: #FFFFFF !important;
+  color: #2563EB !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Shadows in glass view */
+.glass-light-mode .glass-view-content .shadow-sm,
+.glass-light-mode .glass-view-content .shadow-md,
+.glass-light-mode .glass-view-content .shadow-lg {
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Badge overrides */
+.glass-light-mode .glass-view-content .badge,
+.glass-light-mode .glass-view-content [class*="bg-green-100"],
+.glass-light-mode .glass-view-content [class*="bg-red-100"],
+.glass-light-mode .glass-view-content [class*="bg-blue-100"] {
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+/* White text in glass view overrides */
+.glass-light-mode .glass-view-content .text-white,
+.glass-light-mode .glass-view-content .text-white\/90,
+.glass-light-mode .glass-view-content .text-white\/80 {
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-view-content .text-white\/50,
+.glass-light-mode .glass-view-content .text-white\/40 {
+  color: #64748B !important;
+}
+
+/* ===== HEADER SPECIFIC TEXT ===== */
+.glass-light-mode .glass-header .text-white,
+.glass-light-mode .glass-header .text-white\/90,
+.glass-light-mode .glass-header .text-white\/80,
+.glass-light-mode .glass-header h1,
+.glass-light-mode .glass-header h2,
+.glass-light-mode .glass-header p {
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-header .text-slate-400,
+.glass-light-mode .glass-header .text-slate-300 {
+  color: #64748B !important;
+}
+
+/* ===== PROFILE VIEW ===== */
+.glass-light-mode .glass-view-content .bg-white\/\[0\.03\],
+.glass-light-mode .Glass-view-content .bg-white\/\[0\.05\] {
+  background: #FAFBFC !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* ===== SELECT DROPDOWNS ===== */
+.glass-light-mode .glass-select-content {
+  background: #FFFFFF !important;
+  border: 1px solid #E7EBF0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+.glass-light-mode .glass-select-item:hover,
+.glass-light-mode .glass-select-item[data-highlighted] {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* ===== WHITE OPACITY BACKGROUNDS → LIGHT ===== */
+.glass-light-mode .bg-white\/5 {
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+
+.glass-light-mode .bg-white\/10 {
+  background: rgba(15, 23, 42, 0.06) !important;
+}
+
+.glass-light-mode .bg-white\/20 {
+  background: rgba(15, 23, 42, 0.08) !important;
+}
+
+/* ===== TRANSACTION FORM OVERRIDES ===== */
+.glass-light-mode .glass-input-success {
+  background: rgba(22, 163, 74, 0.06) !important;
+  border-color: rgba(22, 163, 74, 0.3) !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .glass-input-danger {
+  background: rgba(220, 38, 38, 0.06) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  color: #0F172A !important;
+}
+
+/* ===== RESPONSIVE MOBILE (max-width 767px) ===== */
+@media (max-width: 767px) {
+  .glass-light-mode body {
+    background: #F5F7FA !important;
+  }
+
+  .glass-light-mode .mobile-container {
+    background: #F5F7FA !important;
+  }
+
+  .glass-light-mode .glass-app {
+    background: #F5F7FA !important;
+  }
+
+  .glass-light-mode .glass-card {
+    background: #FFFFFF !important;
+  }
+
+  .glass-light-mode .glass-nav {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-top-color: #E7EBF0 !important;
+  }
+
+  /* Mobile nav tab text */
+  .glass-light-mode .glass-nav button span {
+    color: #64748B;
+  }
+
+  .glass-light-mode .glass-nav button.text-white span,
+  .glass-light-mode .glass-nav [class*="text-white"] span {
+    color: #0F172A !important;
+  }
+
+  /* Active mobile nav */
+  .glass-light-mode .glass-nav [class*="bg-blue-600/20"] span,
+  .glass-light-mode .glass-nav [class*="bg-blue-600/20"] svg {
+    color: #2563EB !important;
+  }
+}
+
+/* ===== APPLE CONTROL LIST ===== */
+.glass-light-mode .apple-control-container {
+  background: #FFFFFF;
+  border: 1px solid #E7EBF0;
+  box-shadow: 0px 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+/* ===== POPOVER / DIALOG ===== */
+.glass-light-mode [role="dialog"]:not([class*="!bg-"]) {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+/* ===== BACKGROUND OPACITY FIXES ===== */
+.glass-light-mode .bg-white\/\[0\.03\],
+.glass-light-mode .bg-white\/\[0\.02\] {
+  background: rgba(248, 250, 252, 0.85) !important;
+}
+
+/* Sidebar nav item active */
+.glass-light-mode .bg-sidebar-accent {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #2563EB !important;
+}
+
+/* ===== TRANSITION SMOOTHNESS ===== */
+.glass-app,
+.glass-card,
+.glass-header,
+.glass-nav,
+.glass-action-card,
+.glass-transaction-row,
+.glass-balance-hero {
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, color 0.35s ease;
+}
+
+/* ===== PREVENT TABS FLASHING ===== */
+.glass-light-mode [role="tab"] {
+  transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+/* ===== ICON COLOR FIXES IN LIGHT MODE ===== */
+/* Preserve explicit color utility on SVGs inside glass cards */
+.glass-light-mode .glass-nav svg {
+  color: inherit;
+}
+
+/* ===== FINANCIAL AMOUNT COLORS — Keep vivid ===== */
+.glass-light-mode .glass-amount-positive {
+  color: #16A34A !important;
+}
+
+.glass-light-mode .glass-amount-negative {
+  color: #DC2626 !important;
+}
+
+/* Financial text colors in glass-view-content in light mode */
+.glass-light-mode .glass-view-content .text-green-600,
+.glass-light-mode .glass-view-content .text-green-500,
+.glass-light-mode .glass-view-content .text-green-400,
+.glass-light-mode .glass-view-content .text-green-700,
+.glass-light-mode .glass-view-content .text-emerald-600,
+.glass-light-mode .glass-view-content .text-emerald-500,
+.glass-light-mode .glass-view-content .text-emerald-400 {
+  color: #16A34A !important;
+}
+
+.glass-light-mode .glass-view-content .text-red-600,
+.glass-light-mode .glass-view-content .text-red-500,
+.glass-light-mode .glass-view-content .text-red-400,
+.glass-light-mode .glass-view-content .text-red-700,
+.glass-light-mode .glass-view-content .text-rose-600,
+.glass-light-mode .glass-view-content .text-rose-500,
+.glass-light-mode .glass-view-content .text-rose-400 {
+  color: #DC2626 !important;
+}
+
+/* ===== NAV ITEM bg-\[#0f172a\]/40 class FIX ===== */
+.glass-light-mode nav [class*="bg-\\[\\#0f172a\\]"] {
+  background: #F1F5F9 !important;
+}
+
+/* ===== ACTIVE NAV ITEMS — light blue bg ===== */
+.glass-light-mode nav button[class*="bg-blue-600\\/20"],
+.glass-light-mode nav button[class*="bg-blue-600/20"] {
+  background: rgba(37, 99, 235, 0.10) !important;
+  border-color: rgba(37, 99, 235, 0.20) !important;
+  color: #2563EB !important;
+}
+
+.glass-light-mode nav button[class*="bg-blue-600\\/20"] span,
+.glass-light-mode nav button[class*="bg-blue-600/20"] span,
+.glass-light-mode nav button[class*="bg-blue-600\\/20"] svg,
+.glass-light-mode nav button[class*="bg-blue-600/20"] svg {
+  color: #2563EB !important;
+}
+
+/* ======================================================
+   TARGETED FIXES FOR HARDCODED DARK COMPONENT BACKGROUNDS
+   ====================================================== */
+
+/* ─── GlassProfileView: Admin Control Panel ─────────── */
+/* from-violet-900/30 via-indigo-900/20 to-slate-900/40 */
+.glass-light-mode [class*="from-violet-900"] {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(99, 102, 241, 0.04) 50%, rgba(248, 250, 252, 0.8) 100%) !important;
+  border-color: rgba(124, 58, 237, 0.20) !important;
+  backdrop-filter: none !important;
+}
+
+/* Admin control panel text fixes */
+.glass-light-mode [class*="from-violet-900"] .text-violet-300,
+.glass-light-mode [class*="from-violet-900"] p[class*="text-violet-300"] {
+  color: #6D28D9 !important;
+}
+
+.glass-light-mode [class*="from-violet-900"] h3.text-white,
+.glass-light-mode [class*="from-violet-900"] h3,
+.glass-light-mode [class*="from-violet-900"] p.text-white,
+.glass-light-mode [class*="from-violet-900"] p.text-lg.font-black.text-white {
+  color: #0F172A !important;
+}
+
+.glass-light-mode [class*="from-violet-900"] .text-slate-400,
+.glass-light-mode [class*="from-violet-900"] p[class*="text-slate-400"],
+.glass-light-mode [class*="from-violet-900"] label {
+  color: #64748B !important;
+}
+
+.glass-light-mode [class*="from-violet-900"] .text-slate-500 {
+  color: #64748B !important;
+}
+
+.glass-light-mode [class*="from-violet-900"] .text-amber-300 {
+  color: #D97706 !important;
+}
+
+.glass-light-mode [class*="from-violet-900"] .text-emerald-300 {
+  color: #059669 !important;
+}
+
+/* Admin control panel inner box (bg-white/5) */
+.glass-light-mode [class*="from-violet-900"] .bg-white\/5,
+.glass-light-mode [class*="from-violet-900"] [class*="bg-white/5"] {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* Month/Year selector in admin panel */
+.glass-light-mode [class*="from-violet-900"] select {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+/* ─── GlassProfileView: Theme Switcher Panel ─────────── */
+/* from-slate-900/80 via-blue-900/20 to-slate-900/60 */
+.glass-light-mode [class*="from-slate-900"][class*="to-slate-900"] {
+  background: linear-gradient(135deg, #FAFBFC 0%, rgba(37, 99, 235, 0.04) 50%, #FAFBFC 100%) !important;
+  border-color: rgba(37, 99, 235, 0.15) !important;
+  backdrop-filter: none !important;
+}
+
+.glass-light-mode [class*="from-slate-900"][class*="to-slate-900"] .text-blue-300 {
+  color: #1D4ED8 !important;
+}
+
+.glass-light-mode [class*="from-slate-900"][class*="to-slate-900"] h3.text-white,
+.glass-light-mode [class*="from-slate-900"][class*="to-slate-900"] h3 {
+  color: #0F172A !important;
+}
+
+.glass-light-mode [class*="from-slate-900"][class*="to-slate-900"] .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* Theme toggle buttons inside appearance card */
+.glass-light-mode [class*="from-slate-900"] .bg-white\/5,
+.glass-light-mode [class*="from-slate-900"] [class*="bg-white/5"] {
+  background: #F1F5F9 !important;
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode [class*="from-slate-900"] .text-slate-500 button,
+.glass-light-mode [class*="from-slate-900"] button.text-slate-500 {
+  color: #475569 !important;
+}
+
+/* Active dark theme button in light mode */
+.glass-light-mode .bg-slate-800 {
+  background: #334155 !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+/* ─── GlassTransactionsView: Summary Card Backgrounds ─── */
+/* These dark-900/30 dark gradients need to become very light */
+
+/* The 4 stat cards at the top of Transactions view */
+.glass-light-mode .glass-card[class*="from-green-900"],
+.glass-light-mode .glass-card[class*="from-red-900"],
+.glass-light-mode .glass-card[class*="from-blue-900"],
+.glass-light-mode .glass-card[class*="from-emerald-900"] {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* Fallback: any dark -900 gradient on a child of glass-app in light mode */
+.glass-light-mode [class*="bg-gradient-to-br"][class*="from-green-900"] {
+  background: rgba(22, 163, 74, 0.08) !important;
+  border-color: rgba(22, 163, 74, 0.25) !important;
+}
+
+.glass-light-mode [class*="bg-gradient-to-br"][class*="from-red-900"] {
+  background: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+.glass-light-mode [class*="bg-gradient-to-br"][class*="from-blue-900"] {
+  background: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.25) !important;
+}
+
+.glass-light-mode [class*="bg-gradient-to-br"][class*="from-emerald-900"] {
+  background: rgba(5, 150, 105, 0.08) !important;
+  border-color: rgba(5, 150, 105, 0.25) !important;
+}
+
+/* Fix text in Cash In/Out action buttons (dark gradient containers) */
+.glass-light-mode [class*="from-green-900/40"] .text-green-100,
+.glass-light-mode [class*="from-green-900/40"] span.text-sm {
+  color: #15803D !important;
+}
+
+.glass-light-mode [class*="from-red-900/40"] .text-red-100,
+.glass-light-mode [class*="from-red-900/40"] span.text-sm {
+  color: #B91C1C !important;
+}
+
+/* ─── Generic dark from-*-900 overrides for all remaining cases ─── */
+.glass-light-mode [class*="from-indigo-900"],
+.glass-light-mode [class*="from-blue-900"],
+.glass-light-mode [class*="from-slate-900"] {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* ─── Main content area fixes ─── */
+.glass-light-mode .glass-mobile-container,
+.glass-light-mode main,
+.glass-light-mode .glass-app-shell main {
+  background: transparent !important;
+}
+
+/* ─── Reports Page Clean Up (ReportsClean.tsx) ─── */
+.glass-light-mode .bg-white\/\[0\.03\],
+.glass-light-mode .bg-white\/\[0\.01\],
+.glass-light-mode .bg-white\/\[0\.04\],
+.glass-light-mode [class*="bg-white/0.0"] {
+  background: rgba(15, 23, 42, 0.03) !important;
+  border-color: #E7EBF0 !important;
+}
+
+.glass-light-mode [class*="bg-emerald-500/"],
+.glass-light-mode [class*="bg-rose-500/"],
+.glass-light-mode [class*="bg-blue-500/"],
+.glass-light-mode [class*="bg-purple-500/"],
+.glass-light-mode [class*="bg-indigo-500/"] {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* But keep some vibrancy for the progress bars / icons */
+.glass-light-mode .h-2\.5.bg-white\/\[0\.02\] {
+  background: #F1F5F9 !important;
+}
+
+/* Reports Header Gradient Box Overrides */
+.glass-light-mode [class*="bg-gradient-to-br"][class*="from-indigo-500"] {
+  background: #2563EB !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25) !important;
+}
+
+/* Activity Hidden Placeholder */
+.glass-light-mode .glass-card.p-8.text-center.border-white\/10 {
+  background: #FFFFFF !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04) !important;
+}
+
+/* Fix yellow/amber label text */
+.glass-light-mode .bg-amber-500.text-white {
+  background: #F59E0B !important;
+  color: #FFFFFF !important; /* Keep white on amber for contrast */
+}
+
+/* ─── Final specific profile view refinements ─── */
+.glass-light-mode .glass-view-content [role="dialog"],
+.glass-light-mode .glass-view-content .glass-card {
+  background: #FFFFFF !important;
+}
+
+/* Final text contrast check */
+.glass-light-mode .text-slate-600 {
+  color: #475569 !important;
+}
+
+.glass-light-mode .text-slate-800 {
+  color: #1E293B !important;
+}
+
+.glass-light-mode h1, .glass-light-mode h2, .glass-light-mode h3 {
+  color: #0F172A !important;
+}
+
+/* Ensure no element inside main is dark */
+.glass-light-mode main .bg-black,
+.glass-light-mode main [class*="bg-[#0f172a]"] {
+  background: #F5F7FA !important;
+}
+
+/* ======================================================
+   TRANSACTION FORM MODAL — LIGHT MODE STYLES
+   ====================================================== */
+
+/* Card container */
+.glass-light-mode .transaction-form-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E7EBF0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+  backdrop-filter: none !important;
+}
+
+/* Header bar */
+.glass-light-mode .transaction-form-card > div:first-child {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-bottom-color: #E7EBF0 !important;
+}
+
+.glass-light-mode .transaction-form-card h3,
+.glass-light-mode .transaction-form-card [class*="CardTitle"] {
+  color: #0F172A !important;
+}
+
+/* Scrollable content area */
+.glass-light-mode .transaction-form-card .flex-1.overflow-y-auto {
+  background: #FFFFFF !important;
+}
+
+/* Light mode input variants for transaction form */
+.glass-light-mode .glass-input-success-light {
+  background: rgba(22, 163, 74, 0.06) !important;
+  border: 1px solid rgba(22, 163, 74, 0.25) !important;
+  color: #0F172A !important;
+  border-radius: 10px;
+}
+
+.glass-light-mode .glass-input-success-light:focus {
+  background: #FFFFFF !important;
+  border-color: #16A34A !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12) !important;
+  outline: none !important;
+}
+
+.glass-light-mode .glass-input-danger-light {
+  background: rgba(220, 38, 38, 0.04) !important;
+  border: 1px solid rgba(220, 38, 38, 0.2) !important;
+  color: #0F172A !important;
+  border-radius: 10px;
+}
+
+.glass-light-mode .glass-input-danger-light:focus {
+  background: #FFFFFF !important;
+  border-color: #DC2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12) !important;
+  outline: none !important;
+}
+
+/* Date/time inputs in transaction form */
+.glass-light-mode .transaction-form-card input[type="date"],
+.glass-light-mode .transaction-form-card input[type="time"] {
+  color-scheme: light;
+}
+
+/* Select trigger in transaction form */
+.glass-light-mode .transaction-form-card [role="combobox"] {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+/* Select dropdown portal content */
+.glass-light-mode .transaction-modal-content ~ [role="presentation"] [data-radix-select-viewport],
+.glass-light-mode [data-radix-select-viewport] {
+  background: #FFFFFF !important;
+}
+
+/* Labels inside transaction form */
+.glass-light-mode .transaction-form-card label {
+  color: #374151 !important;
+}
+
+/* Disabled inputs */
+.glass-light-mode .transaction-form-card input:disabled {
+  background: #F1F5F9 !important;
+  color: #64748B !important;
+  border-color: #E7EBF0 !important;
+}
+
+/* Transaction form section borders */
+.glass-light-mode .transaction-form-card .border-t {
+  border-color: #E7EBF0 !important;
+}
+
+/* Textarea in transaction form */
+.glass-light-mode .transaction-form-card textarea {
+  background: #FFFFFF !important;
+  border-color: #E7EBF0 !important;
+  color: #0F172A !important;
+}
+
+.glass-light-mode .transaction-form-card textarea:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+.glass-light-mode .transaction-form-card textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Dialog overlay in light mode */
+.glass-light-mode [data-radix-dialog-overlay] {
+  background: rgba(15, 23, 42, 0.3) !important;
+}
+
+/* Select portal content fix for transaction form */
+.glass-light-mode [data-radix-popper-content-wrapper] [data-radix-select-content] {
+  background: #FFFFFF !important;
+  border: 1px solid #E7EBF0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+.glass-light-mode [data-radix-popper-content-wrapper] [data-radix-select-viewport] [role="option"] {
+  color: #0F172A !important;
+}
+
+.glass-light-mode [data-radix-popper-content-wrapper] [data-radix-select-viewport] [role="option"]:hover,
+.glass-light-mode [data-radix-popper-content-wrapper] [data-radix-select-viewport] [role="option"][data-highlighted] {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* ======================================================
+   DIALOG / MODAL PERFORMANCE OVERRIDES
+   ====================================================== */
+
+/* Disable all animations on dialog overlay and content */
+[data-radix-dialog-overlay],
+[data-radix-dialog-content] {
+  animation: none !important;
+  transition: none !important;
+}
+
+[data-radix-dialog-overlay] * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+
+/* Prevent the fade-out delay on close */
+[data-state="closed"][data-radix-dialog-overlay] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-state="closed"][data-radix-dialog-content] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-state="open"][data-radix-dialog-overlay] {
+  opacity: 1;
+}
+
+[data-state="open"][data-radix-dialog-content] {
+  opacity: 1;
+}

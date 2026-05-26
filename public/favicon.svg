@@ -1,0 +1,16 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Teal curved section -->
+  <path d="M2 2 C2 2, 26 2, 26 2 C30 2, 30 6, 30 6 L30 8 C30 8, 26 8, 26 8 L2 8 C2 8, 2 6, 2 6 Z" fill="#1DB584"/>
+  
+  <!-- White curved connector -->
+  <path d="M5.6 8 C5.6 8, 6.4 8.8, 7.2 8.8 L30 8.8 L30 9.6 L7.2 9.6 C6.4 9.6, 5.6 10.4, 5.6 10.4 Z" fill="#FFFFFF"/>
+  
+  <!-- Orange section -->
+  <path d="M6.4 9.6 L28 9.6 C28.8 9.6, 28.8 10.4, 28.8 10.4 L28.8 12 C28.8 12, 28 12, 28 12 L6.4 12 C6.4 12, 6.4 10.4, 6.4 10.4 Z" fill="#FF6B35"/>
+  
+  <!-- Blue main section -->
+  <path d="M2 12.8 L28 12.8 C30 12.8, 30 14.8, 30 14.8 L30 28 C30 30, 28 30, 28 30 L4 30 C2 30, 2 28, 2 28 Z" fill="#2E86C1"/>
+  
+  <!-- White curved cutout in blue section -->
+  <path d="M17.6 18 C17.6 18, 20 18, 22.4 18 C24.8 18, 27.2 20.4, 27.2 22.8 C27.2 25.2, 24.8 27.6, 22.4 27.6 L17.6 27.6 Z" fill="#FFFFFF"/>
+</svg>

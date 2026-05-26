@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart_Savings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+        }
+        .url-test {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2563eb;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fef2f2; color: #dc2626; }
+        .loading { background: #fef3c7; color: #d97706; }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Lighthouse Cashbook URL Test</h1>
+        
+        <div class="url-test">
+            <h3>Testing URL:</h3>
+            <p id="current-url">https://cyrusmaboshe.github.io/lighthouse-cash-flow-keeper/</p>
+            
+            <div id="status" class="status loading">
+                🔄 Testing URL accessibility...
+            </div>
+            
+            <button onclick="testUrl()">🔄 Test Again</button>
+            <button onclick="openInNewTab()">🔗 Open in New Tab</button>
+        </div>
+        
+        <div>
+            <h3>Preview (How it will look in the app):</h3>
+            <iframe id="preview" src="about:blank"></iframe>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+            <h4>📱 Next Steps:</h4>
+            <ol>
+                <li>Verify the website loads correctly above</li>
+                <li>If it works, run <code>build_apk.bat</code> to create the APK</li>
+                <li>If it doesn't work, update the URL in <code>lib/main.dart</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const url = 'https://cyrusmaboshe.github.io/lighthouse-cash-flow-keeper/';
+        
+        function testUrl() {
+            const statusDiv = document.getElementById('status');
+            const iframe = document.getElementById('preview');
+            
+            statusDiv.className = 'status loading';
+            statusDiv.innerHTML = '🔄 Testing URL accessibility...';
+            
+            // Test if URL is accessible
+            fetch(url, { mode: 'no-cors' })
+                .then(() => {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ URL is accessible! Ready to build APK.';
+                    iframe.src = url;
+                })
+                .catch(() => {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = '❌ URL not accessible. Check if website is deployed.';
+                    iframe.src = 'about:blank';
+                });
+        }
+        
+        function openInNewTab() {
+            window.open(url, '_blank');
+        }
+        
+        // Test on page load
+        window.onload = function() {
+            setTimeout(testUrl, 1000);
+        };
+    </script>
+</body>
+</html>

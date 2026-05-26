@@ -1,0 +1,16 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Teal curved section -->
+  <path d="M50 50 C50 50, 650 50, 650 50 C750 50, 750 150, 750 150 L750 200 C750 200, 650 200, 650 200 L50 200 C50 200, 50 150, 50 150 Z" fill="#1DB584"/>
+  
+  <!-- White curved connector -->
+  <path d="M140 200 C140 200, 160 220, 180 220 L750 220 L750 240 L180 240 C160 240, 140 260, 140 260 Z" fill="#FFFFFF"/>
+  
+  <!-- Orange section -->
+  <path d="M160 240 L700 240 C720 240, 720 260, 720 260 L720 300 C720 300, 700 300, 700 300 L160 300 C160 300, 160 260, 160 260 Z" fill="#FF6B35"/>
+  
+  <!-- Blue main section -->
+  <path d="M50 320 L700 320 C750 320, 750 370, 750 370 L750 700 C750 750, 700 750, 700 750 L100 750 C50 750, 50 700, 50 700 Z" fill="#2E86C1"/>
+  
+  <!-- White curved cutout in blue section -->
+  <path d="M440 450 C440 450, 500 450, 560 450 C620 450, 680 510, 680 570 C680 630, 620 690, 560 690 L440 690 Z" fill="#FFFFFF"/>
+</svg>

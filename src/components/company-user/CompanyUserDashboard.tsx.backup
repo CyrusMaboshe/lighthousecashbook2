@@ -1,0 +1,439 @@
+// Company User Dashboard - Robust implementation to avoid 404 errors
+// This component provides a complete dashboard for company users
+// Fixed isLoading variable conflict
+
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  Users,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Plus,
+  Minus,
+  Settings,
+  Bell,
+  MessageSquare,
+  FileText,
+  Calendar,
+  Building2,
+  LogOut,
+  Home
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
+import { MTTransactionManager } from '@/components/company/MTTransactionManager';
+import { MTTransactionManagerSafe } from '@/components/company/MTTransactionManagerSafe';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+
+interface UserStats {
+  totalTransactions: number;
+  totalCashIn: number;
+  totalCashOut: number;
+  netBalance: number;
+  thisMonth: number;
+}
+
+export function CompanyUserDashboard() {
+  const { currentUser, currentCompany, signOut, isLoading: authLoading, isInitialized } = useMultiTenantAuth();
+
+  // Show loading state while authentication is initializing
+  if (!isInitialized || authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if user or company is not available
+  if (!currentUser || !currentCompany) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Authentication Error</h2>
+          <p className="text-gray-600 mb-4">Unable to load user or company information.</p>
+          <button
+            onClick={() => window.location.href = '/company-login'}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          >
+            Return to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<UserStats>({
+    totalTransactions: 0,
+    totalCashIn: 0,
+    totalCashOut: 0,
+    netBalance: 0,
+    thisMonth: 0
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Determine active tab based on URL
+  const getActiveTab = () => {
+    const path = location.pathname;
+    if (path.includes('/transactions')) return 'transactions';
+    if (path.includes('/reports')) return 'reports';
+    if (path.includes('/settings')) return 'settings';
+    return 'overview';
+  };
+
+  const handleLogout = async () => {
+    try {
+      console.log('🔄 Company user logging out...');
+      await signOut();
+      window.location.href = '/'; // Redirect to Smart vault login page
+    } catch (error) {
+      console.error('Logout error:', error);
+      window.location.href = '/'; // Redirect to Smart vault login page
+    }
+  };
+
+  // Load user statistics
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        setStatsLoading(true);
+        // Simulate loading user stats
+        // In a real app, you'd fetch from your API
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        setStats({
+          totalTransactions: 25,
+          totalCashIn: 15000,
+          totalCashOut: 8500,
+          netBalance: 6500,
+          thisMonth: 12
+        });
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
+
+  // Show loading state
+  if (statsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900">Loading Dashboard...</h2>
+          <p className="text-gray-600">Please wait while we prepare your workspace</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if no user or company
+  if (!currentUser || !currentCompany) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <Users className="h-5 w-5" />
+              Access Error
+            </CardTitle>
+            <CardDescription>
+              Unable to load your dashboard. Please try logging in again.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => window.location.href = '/company-login'}
+              className="w-full"
+            >
+              Return to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Company Info */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Building2 className="h-8 w-8 text-purple-600" />
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">{currentCompany.display_name}</h1>
+                  <p className="text-xs text-gray-500">Company User Dashboard</p>
+                </div>
+              </div>
+            </div>
+
+            {/* User Info & Logout */}
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm">
+                <Bell className="h-4 w-4 mr-2" />
+                Notifications
+              </Button>
+
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {currentUser.username || currentUser.email}
+                </p>
+                <p className="text-xs text-gray-500">Company User</p>
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Welcome Section */}
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-8 rounded-lg mb-8">
+          <h2 className="text-3xl font-bold mb-4">
+            👤 Welcome, {currentUser.username || 'User'}!
+          </h2>
+          <p className="text-purple-100 text-lg mb-2">
+            You're logged into {currentCompany.display_name} as a company user.
+          </p>
+          <p className="text-purple-200 text-sm">
+            Manage your transactions and view your financial activity.
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">My Transactions</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalTransactions}</div>
+              <p className="text-xs text-muted-foreground">
+                +{stats.thisMonth} this month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Cash In</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                ${stats.totalCashIn.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total income recorded
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Cash Out</CardTitle>
+              <TrendingDown className="h-4 w-4 text-red-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">
+                ${stats.totalCashOut.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total expenses recorded
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Net Balance</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${
+                stats.netBalance >= 0 ? 'text-green-600' : 'text-red-600'
+              }`}>
+                ${stats.netBalance.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Current balance
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Tabs value={getActiveTab()} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Quick Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>Common tasks and shortcuts</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      className="h-20 flex-col bg-green-600 hover:bg-green-700"
+                      onClick={() => {
+                        // Navigate to transactions tab and trigger cash-in
+                        const transactionsTab = document.querySelector('[value="transactions"]') as HTMLElement;
+                        transactionsTab?.click();
+                      }}
+                    >
+                      <Plus className="h-6 w-6 mb-2" />
+                      Cash In
+                    </Button>
+                    <Button
+                      className="h-20 flex-col bg-red-600 hover:bg-red-700"
+                      onClick={() => {
+                        // Navigate to transactions tab and trigger cash-out
+                        const transactionsTab = document.querySelector('[value="transactions"]') as HTMLElement;
+                        transactionsTab?.click();
+                      }}
+                    >
+                      <Minus className="h-6 w-6 mb-2" />
+                      Cash Out
+                    </Button>
+                    <Button variant="outline" className="h-20 flex-col">
+                      <BarChart3 className="h-6 w-6 mb-2" />
+                      View Reports
+                    </Button>
+                    <Button variant="outline" className="h-20 flex-col">
+                      <FileText className="h-6 w-6 mb-2" />
+                      My History
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Activity */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Activity</CardTitle>
+                  <CardDescription>Your latest transactions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">Office Supplies</p>
+                        <p className="text-sm text-muted-foreground">Today, 2:30 PM</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-red-600">-$150.00</p>
+                        <Badge variant="destructive">Expense</Badge>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium">Client Payment</p>
+                        <p className="text-sm text-muted-foreground">Yesterday, 4:15 PM</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-green-600">+$2,500.00</p>
+                        <Badge variant="default">Income</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="transactions" className="space-y-4">
+            <ErrorBoundary fallback={<MTTransactionManagerSafe />}>
+              <MTTransactionManager />
+            </ErrorBoundary>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Reports</CardTitle>
+                <CardDescription>Your financial reports and analytics</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-2">Personal reporting coming soon</p>
+                  <p className="text-sm text-gray-400">
+                    View detailed reports of your financial activity and trends.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Settings</CardTitle>
+                <CardDescription>Configure your personal preferences</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Account Information</h4>
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                      <p><strong>Email:</strong> {currentUser.email}</p>
+                      <p><strong>Username:</strong> {currentUser.username || 'Not set'}</p>
+                      <p><strong>Role:</strong> Company User</p>
+                      <p><strong>Company:</strong> {currentCompany.display_name}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium mb-2">Preferences</h4>
+                    <p className="text-sm text-gray-500">
+                      User preference settings will be available soon.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+    </ErrorBoundary>
+  );
+}

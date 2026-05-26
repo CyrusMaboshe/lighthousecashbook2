@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart_Savings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .option:hover {
+            border-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+        }
+        
+        .option.recommended {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+        }
+        
+        .option h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .option.recommended h3 {
+            color: #059669;
+        }
+        
+        .option p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .btn.green:hover {
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .steps {
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+        }
+        
+        .steps h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .steps ol {
+            color: #78350f;
+            padding-left: 20px;
+        }
+        
+        .steps li {
+            margin-bottom: 5px;
+        }
+        
+        .url-display {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            margin: 15px 0;
+        }
+        
+        .badge {
+            background: #10b981;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 APK Builder</h1>
+            <p>Convert Smart Savings to Android App</p>
+        </div>
+        
+        <div class="content">
+            <div class="url-display">
+                🌐 Website: https://cyrusmaboshe.github.io/lighthouse-cash-flow-keeper/
+            </div>
+            
+            <div class="option recommended" onclick="openAppsGeyser()">
+                <h3>🚀 AppsGeyser (Online Builder) <span class="badge">RECOMMENDED</span></h3>
+                <p>Create your APK online in 2-3 minutes. No software installation required. Completely free and easy to use.</p>
+                
+                <div class="steps">
+                    <h4>📋 Quick Steps:</h4>
+                    <ol>
+                        <li>Click the button below to open AppsGeyser</li>
+                        <li>Choose "Website" template</li>
+                        <li>Enter your website URL (already copied!)</li>
+                        <li>Name your app "Lighthouse Cashbook"</li>
+                        <li>Download the APK file</li>
+                    </ol>
+                </div>
+                
+                <a href="#" class="btn green" onclick="openAppsGeyser(); return false;">
+                    🚀 Build APK with AppsGeyser
+                </a>
+            </div>
+            
+            <div class="option" onclick="openAppyPie()">
+                <h3>📱 Appy Pie (Alternative)</h3>
+                <p>Another online APK builder with more customization options. Free tier available.</p>
+                <a href="#" class="btn" onclick="openAppyPie(); return false;">
+                    🔧 Try Appy Pie
+                </a>
+            </div>
+            
+            <div class="option" onclick="showAndroidStudio()">
+                <h3>🛠️ Android Studio (Advanced)</h3>
+                <p>For developers who want full control. Requires Android Studio installation.</p>
+                <a href="#" class="btn" onclick="showAndroidStudio(); return false;">
+                    📖 View Instructions
+                </a>
+            </div>
+            
+            <div class="steps">
+                <h4>📱 After Building Your APK:</h4>
+                <ol>
+                    <li><strong>Download</strong> the APK file to your computer</li>
+                    <li><strong>Transfer</strong> to Android device (USB/WhatsApp/Email)</li>
+                    <li><strong>Enable</strong> "Install from Unknown Sources" in Android settings</li>
+                    <li><strong>Install</strong> by tapping the APK file</li>
+                    <li><strong>Enjoy</strong> your Lighthouse Cashbook app!</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const websiteUrl = 'https://cyrusmaboshe.github.io/lighthouse-cash-flow-keeper/';
+        
+        function openAppsGeyser() {
+            // Copy URL to clipboard
+            copyToClipboard(websiteUrl);
+            
+            // Show instructions
+            alert(`✅ Website URL copied to clipboard!\n\n📋 Next steps:\n1. Click OK to open AppsGeyser\n2. Choose "Website" template\n3. Paste the URL (Ctrl+V)\n4. Name: "Smart Savings"\n5. Create your APK!`);
+            
+            // Open AppsGeyser
+            window.open('https://appsgeyser.com/', '_blank');
+        }
+        
+        function openAppyPie() {
+            copyToClipboard(websiteUrl);
+            alert(`✅ Website URL copied to clipboard!\n\nOpening Appy Pie...`);
+            window.open('https://www.appypie.com/app-builder/website-to-app', '_blank');
+        }
+        
+        function showAndroidStudio() {
+            alert(`🛠️ Android Studio Method:\n\n1. Download Android Studio\n2. Create new project\n3. Add WebView with your website URL\n4. Build APK\n\nThis method requires programming knowledge.`);
+        }
+        
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('URL copied to clipboard');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                console.log('URL copied using fallback method');
+            } catch (err) {
+                console.error('Failed to copy URL');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        // Auto-copy URL on page load
+        window.onload = function() {
+            copyToClipboard(websiteUrl);
+        };
+    </script>
+</body>
+</html>
