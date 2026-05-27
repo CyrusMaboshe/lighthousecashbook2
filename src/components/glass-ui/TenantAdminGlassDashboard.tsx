@@ -39,9 +39,10 @@ import { ExportCenter } from '@/components/export/ExportCenter';
 import {
     Plus, Minus, Vault, BarChart3, MessageSquare, Users, Target, PiggyBank,
     FileText, Download, Receipt, Building2, ClipboardList, Wallet, LifeBuoy,
-    Activity, Settings, LayoutDashboard, TrendingUp
+    Activity, Settings, LayoutDashboard, TrendingUp, Sun, Moon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 import './GlassTheme.css';
 
 // ─── Shared Transactions View (wraps GlassTransactionsView with MT data) ──────
@@ -358,6 +359,7 @@ export function TenantAdminGlassDashboard() {
     const mtAuth = useMultiTenantAuth();
     // And get the new tenant context
     const { company: tenantCompany, role: tenantRole } = useTenant();
+    const { theme, setTheme } = useTheme();
 
     const [currentView, setCurrentView] = useState<GlassView>(() => {
         return (localStorage.getItem('tenantAdminView') as GlassView) || 'home';
@@ -515,8 +517,78 @@ export function TenantAdminGlassDashboard() {
                 );
             case 'profile':
                 return (
-                    <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700 p-8">
-                        <UniversalPasswordChange />
+                    <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
+                        <GlassViewWrapper title="Profile Settings" subtitle="Manage your account preferences and theme" onBack={() => handleViewChange('home')}>
+                            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+                                {/* Left Column: Theme / Settings */}
+                                <div className="space-y-6">
+                                    <div className="relative overflow-hidden rounded-2xl border border-blue-500/20 bg-gradient-to-br from-slate-900/80 via-blue-900/20 to-slate-900/60 backdrop-blur-xl shadow-xl">
+                                        <div className="absolute -top-8 -right-8 w-24 h-24 bg-blue-500/10 rounded-full blur-[30px] pointer-events-none" />
+                                        <div className="relative z-10 p-5">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-400/25 flex items-center justify-center shadow-inner">
+                                                    {theme === 'dark' ? (
+                                                        <Moon className="w-4 h-4 text-blue-300" />
+                                                    ) : (
+                                                        <Sun className="w-4 h-4 text-amber-400" />
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="text-[11px] font-black uppercase tracking-widest text-blue-300">Appearance</p>
+                                                    <h3 className="text-base font-bold text-white leading-tight">System Theme</h3>
+                                                </div>
+                                            </div>
+
+                                            {/* Toggle buttons */}
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    id="theme-dark-btn"
+                                                    onClick={() => setTheme('dark')}
+                                                    className={cn(
+                                                        'flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-xl border font-bold text-sm transition-all duration-300',
+                                                        theme === 'dark'
+                                                            ? 'bg-slate-800 border-blue-500/40 text-blue-300 shadow-lg shadow-blue-500/20 scale-[1.02]'
+                                                            : 'bg-white/5 border-white/10 text-slate-500 hover:bg-white/8 hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    <Moon className={cn('w-5 h-5 transition-all', theme === 'dark' ? 'text-blue-400 drop-shadow-sm' : 'text-slate-600')} />
+                                                    <span>Dark 🌙</span>
+                                                    {theme === 'dark' && (
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400/80">Active</span>
+                                                    )}
+                                                </button>
+
+                                                <button
+                                                    id="theme-light-btn"
+                                                    onClick={() => setTheme('light')}
+                                                    className={cn(
+                                                        'flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-xl border font-bold text-sm transition-all duration-300',
+                                                        theme === 'light'
+                                                            ? 'bg-amber-50/10 border-amber-400/40 text-amber-300 shadow-lg shadow-amber-500/15 scale-[1.02]'
+                                                            : 'bg-white/5 border-white/10 text-slate-500 hover:bg-white/8 hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    <Sun className={cn('w-5 h-5 transition-all', theme === 'light' ? 'text-amber-400 drop-shadow-sm' : 'text-slate-600')} />
+                                                    <span>Light ☀️</span>
+                                                    {theme === 'light' && (
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-400/80">Active</span>
+                                                    )}
+                                                </button>
+                                            </div>
+
+                                            <p className="mt-3 text-[10px] text-slate-500 text-center">
+                                                Switches instantly across the entire app for multi-tenant users.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Password Change */}
+                                <div className="space-y-6">
+                                    <UniversalPasswordChange />
+                                </div>
+                            </div>
+                        </GlassViewWrapper>
                     </div>
                 );
             case 'savings':
