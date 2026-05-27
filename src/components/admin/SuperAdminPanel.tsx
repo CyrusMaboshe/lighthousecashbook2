@@ -43,6 +43,8 @@ import { MTCompany } from '@/services/separateMultiTenantAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { CompanyUserManagement } from '@/components/super-admin/CompanyUserManagement';
 import { AccessControlPanel } from '@/components/super-admin/AccessControlPanel';
+import { SubscriptionManagement } from '@/components/super-admin/SubscriptionManagement';
+import { PayrollManagement } from '@/components/super-admin/PayrollManagement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { SimpleCounter } from '@/components/ui/AnimatedCounter';
@@ -214,9 +216,11 @@ export function SuperAdminPanel() {
       </div>
 
       <Tabs defaultValue="companies" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 glass-card p-1 gap-1.5 bg-white/[0.02] border-white/5 mb-8">
+        <TabsList className="grid w-full grid-cols-6 glass-card p-1 gap-1.5 bg-white/[0.02] border-white/5 mb-8">
           <TabsTrigger value="companies" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Sectors</TabsTrigger>
           <TabsTrigger value="users" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Agents</TabsTrigger>
+          <TabsTrigger value="subscriptions" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-violet-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Subscriptions</TabsTrigger>
+          <TabsTrigger value="payroll" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Payroll</TabsTrigger>
           <TabsTrigger value="admin-management" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Terminal Admins</TabsTrigger>
           <TabsTrigger value="access-control" className="h-11 rounded-xl text-[9px] font-black uppercase tracking-[0.15em] data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-xl transition-all">Guard Protocols</TabsTrigger>
         </TabsList>
@@ -314,6 +318,14 @@ export function SuperAdminPanel() {
 
         <TabsContent value="users" className="animate-in slide-in-from-right-4 duration-500">
           <CompanyUserManagement />
+        </TabsContent>
+
+        <TabsContent value="subscriptions" className="animate-in slide-in-from-right-4 duration-500">
+          <SubscriptionManagement />
+        </TabsContent>
+
+        <TabsContent value="payroll" className="animate-in slide-in-from-right-4 duration-500">
+          <PayrollManagement />
         </TabsContent>
 
         <TabsContent value="admin-management" className="animate-in slide-in-from-right-4 duration-500">

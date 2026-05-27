@@ -279,6 +279,21 @@ export class SeparateMultiTenantAuth {
       }
 
       if (companyAdmin && !adminError) {
+        // ── Subscription / access check ──────────────────────────────────────
+        const { data: subCheck } = await supabase.rpc('check_company_subscription_access', {
+          p_company_id: companyAdmin.company_id
+        });
+        if (subCheck && subCheck.has_access === false) {
+          const reasonMap: Record<string, string> = {
+            suspended: 'Your company account has been suspended. Please contact support.',
+            cancelled: 'Your company subscription has been cancelled. Please contact support.',
+            subscription_expired: `Your company subscription expired on ${subCheck.expired_on || 'an earlier date'}. Please renew to continue.`
+          };
+          const msg = reasonMap[subCheck.reason] || 'Access denied. Please contact your administrator.';
+          console.warn('⛔ Company admin login blocked:', subCheck.reason);
+          return { user: null, error: msg };
+        }
+        // ────────────────────────────────────────────────────────────────────
         console.log('✅ MT Company admin sign in successful');
         return {
           user: {
@@ -319,6 +334,21 @@ export class SeparateMultiTenantAuth {
       console.log('🔍 Company user result:', { companyUser, userError });
 
       if (companyUser && !userError) {
+        // ── Subscription / access check ──────────────────────────────────────
+        const { data: subCheck } = await supabase.rpc('check_company_subscription_access', {
+          p_company_id: companyUser.company_id
+        });
+        if (subCheck && subCheck.has_access === false) {
+          const reasonMap: Record<string, string> = {
+            suspended: 'Your company account has been suspended. Please contact support.',
+            cancelled: 'Your company subscription has been cancelled. Please contact support.',
+            subscription_expired: `Your company subscription expired on ${subCheck.expired_on || 'an earlier date'}. Please renew to continue.`
+          };
+          const msg = reasonMap[subCheck.reason] || 'Access denied. Please contact your administrator.';
+          console.warn('⛔ Company user login blocked:', subCheck.reason);
+          return { user: null, error: msg };
+        }
+        // ────────────────────────────────────────────────────────────────────
         console.log('✅ MT Company user sign in successful');
         return {
           user: {
