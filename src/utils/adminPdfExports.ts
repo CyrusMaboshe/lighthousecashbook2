@@ -11,16 +11,22 @@ interface CustomerData {
 /**
  * Export customers list to PDF (name + phone number)
  */
-export const exportCustomersListToPDF = async (): Promise<void> => {
+export const exportCustomersListToPDF = async (companyId?: string): Promise<void> => {
   try {
     // Fetch all transactions to extract customer data
-    const { data: transactions, error } = await supabase
-      .from('transactions')
+    const tableName = companyId ? 'mt_company_transactions' : 'transactions';
+    let query = supabase
+      .from(tableName)
       .select('customer_name, whatsapp_number, date')
       .eq('type', 'cash-in')
       .not('customer_name', 'is', null)
-      .not('whatsapp_number', 'is', null)
-      .order('date', { ascending: false });
+      .not('whatsapp_number', 'is', null);
+
+    if (companyId) {
+      query = query.eq('company_id', companyId);
+    }
+
+    const { data: transactions, error } = await query.order('date', { ascending: false });
 
     if (error) throw error;
 
@@ -123,17 +129,24 @@ export const exportCustomersListToPDF = async (): Promise<void> => {
 /**
  * Export transaction history to PDF
  */
-export const exportTransactionHistoryToPDF = async (): Promise<void> => {
+export const exportTransactionHistoryToPDF = async (companyId?: string): Promise<void> => {
   try {
+    const tableName = companyId ? 'mt_company_transactions' : 'transactions';
     // Fetch ALL transactions with pagination to bypass the 1000-row limit
     const pageSize = 1000; let from = 0; let transactions: any[] = [];
     for (let page = 0; page < 200; page++) {
-      const { data, error } = await supabase
-        .from('transactions')
+      let query = supabase
+        .from(tableName)
         .select('*')
         .order('date', { ascending: false })
         .order('created_at', { ascending: false })
         .range(from, from + pageSize - 1);
+
+      if (companyId) {
+        query = query.eq('company_id', companyId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       const batch = data || []; transactions = transactions.concat(batch);
       if (batch.length < pageSize) break;

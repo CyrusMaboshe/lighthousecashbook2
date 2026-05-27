@@ -145,19 +145,40 @@ export function GlassTransactionsView({
 
         {showFilters && (
           <div className="mt-3 pt-3 border-t border-white/10 space-y-3 glass-animate-fade-in">
-            {/* Active period — admin sets this from Profile view */}
+            {/* Active period — selectable for all users to view different months */}
             <div className="pb-3 mb-3 border-b border-white/10">
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-3.5 h-3.5 text-violet-300" />
                 <label className="text-xs text-slate-300 font-medium">
                   Active Period
-                  {isAdmin && <span className="ml-2 text-[9px] text-violet-300 font-bold uppercase tracking-widest">(Change in Profile)</span>}
                 </label>
               </div>
-              <div className="px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                <p className="text-sm font-semibold text-white">
-                  {format(new Date(selectedYear, selectedMonth, 1), 'MMMM yyyy')}
-                </p>
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => onMonthChange(parseInt(e.target.value))}
+                  className="glass-input h-10 py-1.5 px-3 text-xs text-white bg-slate-900/80 border border-white/10 rounded-lg focus:outline-none focus:border-violet-500"
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i} value={i} className="bg-slate-950 text-white text-xs">
+                      {format(new Date(2000, i, 1), 'MMMM')}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => onYearChange(parseInt(e.target.value))}
+                  className="glass-input h-10 py-1.5 px-3 text-xs text-white bg-slate-900/80 border border-white/10 rounded-lg focus:outline-none focus:border-violet-500"
+                >
+                  {Array.from({ length: 10 }, (_, i) => {
+                    const y = new Date().getFullYear() - i;
+                    return (
+                      <option key={y} value={y} className="bg-slate-950 text-white text-xs">
+                        {y}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
             </div>
             <div>

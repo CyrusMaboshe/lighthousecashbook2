@@ -33,6 +33,7 @@ import { StudioDocuments } from '@/components/studio-documents/StudioDocuments';
 import { CorePlanView } from '@/components/core-plan/CorePlanView';
 import { TargetsView } from '@/components/views/TargetsView';
 import { ReserveInvestmentView } from '@/components/views/ReserveInvestmentView';
+import { ExportCenter } from '@/components/export/ExportCenter';
 
 import {
     Plus, Minus, Vault, BarChart3, MessageSquare, Users, Target, PiggyBank,
@@ -51,14 +52,16 @@ import './GlassTheme.css';
  */
 function MTGlassTransactionsView({
   companyId,
-  selectedMonth,
+  selectedMonth: initialSelectedMonth,
 }: {
   companyId: string;
   selectedMonth: string;
 }) {
-  const [year, monthStr] = selectedMonth.split('-');
-  const selectedYear = parseInt(year);
-  const selectedMonthNum = parseInt(monthStr) - 1; // 0-indexed for useTransactionFilters
+  const [year, monthStr] = initialSelectedMonth.split('-');
+  const [selectedYear, setSelectedYear] = useState(parseInt(year));
+  const [selectedMonthNum, setSelectedMonthNum] = useState(parseInt(monthStr) - 1); // 0-indexed
+
+  const selectedMonth = `${selectedYear}-${String(selectedMonthNum + 1).padStart(2, '0')}`;
 
   const {
     transactions,
@@ -118,8 +121,8 @@ function MTGlassTransactionsView({
         currentUser={null}
         selectedYear={selectedYear}
         selectedMonth={selectedMonthNum}
-        onYearChange={() => {}}
-        onMonthChange={() => {}}
+        onYearChange={setSelectedYear}
+        onMonthChange={setSelectedMonthNum}
         onDeleteTransaction={deleteTransaction}
         onUpdateTransaction={updateTransaction}
         onAddTransaction={handleAddTransaction}
@@ -212,6 +215,7 @@ function TenantAdminActionGrid({
         { id: 'targets', icon: Target, label: 'Milestones', subtitle: 'Goals', iconColor: 'text-cyan-400', view: 'targets' },
         { id: 'analytics', icon: BarChart3, label: 'Insights', subtitle: 'Analytics', iconColor: 'text-purple-400', view: 'analytics' },
         { id: 'reports', icon: FileText, label: 'Financials', subtitle: 'Reports', iconColor: 'text-blue-400', view: 'reports' },
+        { id: 'exports', icon: Download, label: 'Export Center', subtitle: 'Download data', iconColor: 'text-emerald-400', view: 'exports' },
         { id: 'logs', icon: Activity, label: 'Activity', subtitle: 'Logs', iconColor: 'text-slate-400', view: 'userlogs' },
         { id: 'settings', icon: Settings, label: 'Branding', subtitle: 'Settings', iconColor: 'text-slate-400', view: 'settings' },
         { id: 'reserve-investment', icon: TrendingUp, label: 'Reserve Invest', subtitle: 'Allocations', iconColor: 'text-amber-400', view: 'reserve-investment' },
@@ -470,6 +474,14 @@ export function TenantAdminGlassDashboard() {
                 return (
                     <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
                         <MTGlassReportsView companyId={companyId} currentUserEmail={auth?.user?.email} />
+                    </div>
+                );
+            case 'exports':
+                return (
+                    <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
+                        <GlassViewWrapper title="Export Center" subtitle="Download reports and spreadsheets" onBack={() => handleViewChange('home')}>
+                            <ExportCenter companyId={companyId} />
+                        </GlassViewWrapper>
                     </div>
                 );
             case 'analytics':

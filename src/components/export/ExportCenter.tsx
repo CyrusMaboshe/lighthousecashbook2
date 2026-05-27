@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useMTTransactionAdapter } from '@/hooks/useMTTransactionAdapter';
 import { useTransactionFilters } from '@/hooks/useTransactionFilters';
 import { exportToPDF } from '@/utils/pdfExport';
 import { exportChartsToPDF } from '@/utils/chartExport';
@@ -57,11 +58,17 @@ interface ExportOption {
   isLoading?: boolean;
 }
 
-export function ExportCenter() {
+interface ExportCenterProps {
+  companyId?: string;
+}
+
+export function ExportCenter({ companyId }: ExportCenterProps = {}) {
   const { toast } = useToast();
   const { currentUser, isAdmin } = useAuth();
   const { isSuperAdmin } = useMultiTenantAuth();
-  const { transactions } = useTransactions();
+  const mtResult = useMTTransactionAdapter(companyId || '', '');
+  const globalResult = useTransactions();
+  const transactions = companyId ? mtResult.transactions : globalResult.transactions;
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState('transactions');
 
@@ -113,8 +120,10 @@ export function ExportCenter() {
     const yearNum = year !== 'all' ? Number(year) : null;
     const startDate = yearNum ? `${yearNum}-01-01` : null;
     const endDate = yearNum ? `${yearNum}-12-31` : null;
+    const tableName = companyId ? 'mt_company_transactions' : 'transactions';
     for (let page = 0; page < maxPages; page++) {
-      let query = supabase.from('transactions').select('*').eq('type', type).order('date', { ascending: true }).order('time', { ascending: true }).range(from, from + pageSize - 1);
+      let query = supabase.from(tableName).select('*').eq('type', type).order('date', { ascending: true }).order('time', { ascending: true }).range(from, from + pageSize - 1);
+      if (companyId) query = query.eq('company_id', companyId);
       if (startDate && endDate) query = query.gte('date', startDate).lte('date', endDate);
       const { data, error } = await query;
       if (error) throw error;
@@ -126,8 +135,11 @@ export function ExportCenter() {
 
   const fetchAllTransactionsUpToDate = async (type: 'cash-in' | 'cash-out', dateStr: string) => {
     const pageSize = 1000; let from = 0; let rows: any[] = []; const maxPages = 200;
+    const tableName = companyId ? 'mt_company_transactions' : 'transactions';
     for (let page = 0; page < maxPages; page++) {
-      const { data, error } = await supabase.from('transactions').select('*').eq('type', type).lte('date', dateStr).order('date', { ascending: true }).order('time', { ascending: true }).range(from, from + pageSize - 1);
+      let query = supabase.from(tableName).select('*').eq('type', type).lte('date', dateStr).order('date', { ascending: true }).order('time', { ascending: true }).range(from, from + pageSize - 1);
+      if (companyId) query = query.eq('company_id', companyId);
+      const { data, error } = await query;
       if (error) throw error;
       const batch = data || []; rows = rows.concat(batch);
       if (batch.length < pageSize) break; from += pageSize;
@@ -140,7 +152,7 @@ export function ExportCenter() {
   const exportTransactionsPDF = async () => {
     setLoading('transactions-pdf', true);
     try {
-      await exportTransactionHistoryToPDF();
+      await exportTransactionHistoryToPDF(companyId);
       if (currentUser) logExportPDF(currentUser, { exportType: 'transactions_pdf', transactionCount: (transactions?.length || 0), timestamp: new Date().toISOString() });
       toast({ title: "Export Successful", description: "Transaction history exported to PDF" });
     } catch (error) { toast({ title: "Export Failed", description: "Failed to export PDF", variant: "destructive" }); } finally { setLoading('transactions-pdf', false); }
@@ -163,46 +175,72 @@ export function ExportCenter() {
     try {
       const currentYear = new Date().getFullYear(); const currentMonth = new Date().getMonth() + 1;
       const startDate = new Date(currentYear, currentMonth - 1, 1); const endDate = new Date(currentYear, currentMonth, 0);
-      const { data: monthlyTransactions, error } = await supabase.from('transactions').select('*').gte('date', startDate.toISOString().split('T')[0]).lte('date', endDate.toISOString().split('T')[0]);
+      const tableName = companyId ? 'mt_company_transactions' : 'transactions';
+      let query = supabase.from(tableName).select('*').gte('date', startDate.toISOString().split('T')[0]).lte('date', endDate.toISOString().split('T')[0]);
+      if (companyId) query = query.eq('company_id', companyId);
+      const { data: monthlyTransactions, error } = await query;
       if (error) throw error;
       const totalCashIn = monthlyTransactions?.filter(t => t.type === 'cash-in').reduce((sum, t) => sum + Number(t.amount), 0) || 0;
       const totalCashOut = monthlyTransactions?.filter(t => t.type === 'cash-out').reduce((sum, t) => sum + Number(t.amount), 0) || 0;
       const operationalCashOut = monthlyTransactions?.filter(t => t.type === 'cash-out' && t.category_name !== 'Reserve Investment Withdrawal').reduce((sum, t) => sum + Number(t.amount), 0) || 0;
       const categoryTotals = monthlyTransactions?.reduce((acc, t) => { const c = t.category_name || 'Unknown'; if (!acc[c]) acc[c] = { name: c, amount: 0, count: 0 }; acc[c].amount += Number(t.amount); acc[c].count += 1; return acc; }, {} as Record<string, any>) || {};
       const topCategories = Object.values(categoryTotals).sort((a: any, b: any) => b.amount - a.amount).slice(0, 5);
-      await exportAutomatedReportToPDF({ totalCashIn, totalCashOut, netBalance: totalCashIn - operationalCashOut, transactionCount: monthlyTransactions?.length || 0, topCategories: topCategories.map((c: any) => ({ name: c.name, amount: c.amount, count: c.count })) }, `${currentMonth}/${currentYear}`);
+      await exportAutomatedReportToPDF({ totalCashIn, totalCashOut, netBalance: totalCashIn - operationalCashOut, transactionCount: monthlyTransactions?.length || 0, topCategories: topCategories.map((c: any) => ({ name: c.name, amount: c.count ? c.amount : 0, count: c.count })) }, `${currentMonth}/${currentYear}`);
       if (currentUser) logExportPDF(currentUser, { exportType: 'analytics_report', period: `${currentMonth}/${currentYear}`, timestamp: new Date().toISOString() });
       toast({ title: "Export Successful", description: "Analytics report exported" });
     } catch (error) { toast({ title: "Export Failed", description: "Failed to export report", variant: "destructive" }); } finally { setLoading('analytics-report', false); }
   };
 
   const exportUserData = async () => {
-    if (!isAdmin) return; setLoading('user-data', true);
+    if (!companyId && !isAdmin) return; setLoading('user-data', true);
     try {
-      const { data: users, error } = await supabase.from('users').select('*'); if (error) throw error;
-      const csvContent = [['ID', 'Username', 'Email', 'Role', 'Created At', 'Last Login'].join(','), ...users.map(u => [u.id, u.username, u.email || '', u.role, u.created_at, u.last_login || ''].join(','))].join('\n');
+      let csvContent = '';
+      let count = 0;
+      if (companyId) {
+        const { data: users, error } = await supabase.from('mt_company_users').select('*').eq('company_id', companyId);
+        if (error) throw error;
+        csvContent = [['ID', 'Username', 'Email', 'Role', 'Created At', 'Last Login'].join(','), ...users.map(u => [u.id, u.username, u.email || '', u.role, u.created_at, u.last_login || ''].join(','))].join('\n');
+        count = users.length;
+      } else {
+        const { data: users, error } = await supabase.from('users').select('*'); if (error) throw error;
+        csvContent = [['ID', 'Username', 'Email', 'Role', 'Created At', 'Last Login'].join(','), ...users.map(u => [u.id, u.username, u.email || '', u.role, u.created_at, u.last_login || ''].join(','))].join('\n');
+        count = users.length;
+      }
       const blob = new Blob([csvContent], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `users-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-      toast({ title: "Export Successful", description: `Exported ${users.length} users` });
+      toast({ title: "Export Successful", description: `Exported ${count} users` });
     } catch (error) { toast({ title: "Export Failed", description: "Failed to export users", variant: "destructive" }); } finally { setLoading('user-data', false); }
   };
 
   const exportCategories = async () => {
     setLoading('categories', true);
     try {
-      const { data: categories, error } = await supabase.from('categories').select('*'); if (error) throw error;
-      const csvContent = [['ID', 'Name', 'Type', 'Created At'].join(','), ...categories.map(c => [c.id, c.name, c.type, c.created_at].join(','))].join('\n');
+      const tableName = companyId ? 'mt_company_categories' : 'categories';
+      let query = supabase.from(tableName).select('*');
+      if (companyId) query = query.eq('company_id', companyId);
+      const { data: categories, error } = await query; if (error) throw error;
+      const csvContent = [['ID', 'Name', 'Type', 'Created At'].join(','), ...categories.map(c => [c.id || '', c.name, (c as any).type || '', c.created_at || ''].join(','))].join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `categories-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
       toast({ title: "Export Successful", description: `Exported ${categories.length} categories` });
     } catch (error) { toast({ title: "Export Failed", description: "Failed to export categories", variant: "destructive" }); } finally { setLoading('categories', false); }
   };
 
   const exportSystemLogs = async () => {
-    if (!isAdmin) return; setLoading('system-logs', true);
+    if (!companyId && !isAdmin) return; setLoading('system-logs', true);
     try {
-      const { data: logs, error } = await supabase.from('admin_logs').select('*').order('timestamp', { ascending: false }).limit(1000); if (error) throw error;
-      const csvContent = [['ID', 'Action', 'Performed By', 'Timestamp', 'Details'].join(','), ...logs.map(l => [l.id, l.action, l.performed_by, l.timestamp, JSON.stringify(l.details || {}).replace(/,/g, ';')].join(','))].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `admin-logs-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-      toast({ title: "Export Successful", description: `Exported ${logs.length} logs` });
+      let csvContent = '';
+      let count = 0;
+      if (companyId) {
+        const { data: logs, error } = await supabase.from('mt_company_transactions').select('*').eq('company_id', companyId).order('created_at', { ascending: false }).limit(1000);
+        if (error) throw error;
+        csvContent = [['ID', 'Type', 'Category', 'Amount', 'Date', 'Added By'].join(','), ...logs.map(l => [l.id, l.type, l.category_name, l.amount, l.date, l.added_by].join(','))].join('\n');
+        count = logs.length;
+      } else {
+        const { data: logs, error } = await supabase.from('admin_logs').select('*').order('timestamp', { ascending: false }).limit(1000); if (error) throw error;
+        csvContent = [['ID', 'Action', 'Performed By', 'Timestamp', 'Details'].join(','), ...logs.map(l => [l.id, l.action, l.performed_by, l.timestamp, JSON.stringify(l.details || {}).replace(/,/g, ';')].join(','))].join('\n');
+        count = logs.length;
+      }
+      const blob = new Blob([csvContent], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `logs-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      toast({ title: "Export Successful", description: `Exported ${count} logs` });
     } catch (error) { toast({ title: "Export Failed", description: "Failed to export logs", variant: "destructive" }); } finally { setLoading('system-logs', false); }
   };
 
@@ -689,14 +727,14 @@ export function ExportCenter() {
     { id: 'categories', title: 'Category Mapping CSV', description: 'Structural export of all transaction classifications.', icon: Database, category: 'reports', action: exportCategories, isLoading: loadingStates['categories'] },
     { id: 'user-data', title: 'Verified Agents CSV', description: 'Comprehensive administrative roster and access statistics.', icon: Users, category: 'system', adminOnly: true, action: exportUserData, isLoading: loadingStates['user-data'] },
     { id: 'system-logs', title: 'Administrative Buffer CSV', description: 'Tier-1 system activity and audit logs.', icon: FileText, category: 'system', adminOnly: true, action: exportSystemLogs, isLoading: loadingStates['system-logs'] },
-    { id: 'customers-list-pdf', title: 'Client Registry PDF', description: 'Export verified customer directory with contact metadata.', icon: Users, category: 'system', adminOnly: true, action: async () => { setLoading('customers-list-pdf', true); try { await exportCustomersListToPDF(); toast({ title: "Exported" }); } finally { setLoading('customers-list-pdf', false); } }, isLoading: loadingStates['customers-list-pdf'] }
+    { id: 'customers-list-pdf', title: 'Client Registry PDF', description: 'Export verified customer directory with contact metadata.', icon: Users, category: 'system', adminOnly: true, action: async () => { setLoading('customers-list-pdf', true); try { await exportCustomersListToPDF(companyId); toast({ title: "Exported" }); } finally { setLoading('customers-list-pdf', false); } }, isLoading: loadingStates['customers-list-pdf'] }
   ];
 
   const categories = [
     { id: 'transactions', label: 'Ledgers', icon: Database },
     { id: 'analytics', label: 'Intelligence', icon: BarChart3 },
     { id: 'reports', label: 'Structures', icon: TrendingUp },
-    ...(isAdmin ? [{ id: 'system', label: 'Protocol', icon: Settings }] : [])
+    ...(isAdmin || !!companyId ? [{ id: 'system', label: 'Protocol', icon: Settings }] : [])
   ];
 
   return (
@@ -721,7 +759,7 @@ export function ExportCenter() {
           </div>
           <div className="glass-card bg-blue-500/[0.03] border-blue-500/20 px-6 py-4 flex flex-col items-end min-w-[200px] shadow-2xl">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Active Protocols</span>
-            <span className="text-2xl font-black text-white tabular-nums tracking-tighter">{exportOptions.filter(o => !o.adminOnly || isAdmin).length} FUNCTIONS</span>
+            <span className="text-2xl font-black text-white tabular-nums tracking-tighter">{exportOptions.filter(o => !o.adminOnly || isAdmin || !!companyId).length} FUNCTIONS</span>
           </div>
         </div>
       </div>
@@ -826,7 +864,7 @@ export function ExportCenter() {
           {activeTab === 'system' && (
             <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {exportOptions.filter(o => o.category === 'system' && (!o.adminOnly || isAdmin)).map((option) => (
+                {exportOptions.filter(o => o.category === 'system' && (!o.adminOnly || isAdmin || !!companyId)).map((option) => (
                   <ExportFunctionCard key={option.id} option={option} />
                 ))}
               </div>

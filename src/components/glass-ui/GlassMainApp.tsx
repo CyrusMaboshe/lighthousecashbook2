@@ -20,6 +20,7 @@ import { StudioDocuments } from '@/components/studio-documents/StudioDocuments';
 import { useMTTransactionAdapter } from '@/hooks/useMTTransactionAdapter';
 import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
 import { CustomerAnalytics } from '@/components/company/CustomerAnalytics';
+import { ExportCenter } from '@/components/export/ExportCenter';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/contexts/TenantContext';
@@ -82,14 +83,27 @@ export function GlassMainApp() {
   const isCompanyUser = !!companyId;
   const companyName = company?.display_name || company?.name || 'Lighthouse';
 
+  // Local state override for company users to select month/year
+  const [localMonth, setLocalMonth] = useState<number>(() => selectedMonth);
+  const [localYear, setLocalYear] = useState<number>(() => selectedYear);
+
+  // Keep local month/year in sync with global control initially
+  React.useEffect(() => {
+    setLocalMonth(selectedMonth);
+    setLocalYear(selectedYear);
+  }, [selectedMonth, selectedYear]);
+
+  const activeMonth = isCompanyUser ? localMonth : selectedMonth;
+  const activeYear = isCompanyUser ? localYear : selectedYear;
+
   const { currentUser, isAdmin, logout, systemSettings, logAdminAction } = useAuth();
 
   const { transactions, loading, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
   const { categories, addCategory } = useCategories();
   const { filters, setFilters, getFilteredTransactions } = useTransactionFilters(
     transactions,
-    selectedYear,
-    selectedMonth
+    activeYear,
+    activeMonth
   );
 
   // Track scroll position
@@ -235,10 +249,10 @@ export function GlassMainApp() {
             categories={categories}
             isAdmin={isAdmin}
             currentUser={currentUser}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            onYearChange={() => { }} // controlled centrally by GlobalMonthControl
-            onMonthChange={() => { }} // controlled centrally by GlobalMonthControl
+            selectedYear={activeYear}
+            selectedMonth={activeMonth}
+            onYearChange={isCompanyUser ? setLocalYear : () => { }}
+            onMonthChange={isCompanyUser ? setLocalMonth : () => { }}
             onDeleteTransaction={deleteTransaction}
             onUpdateTransaction={updateTransaction}
             onAddTransaction={handleAddTransaction}
@@ -327,6 +341,13 @@ export function GlassMainApp() {
             <GlassCustomersTab />
           </GlassViewWrapper>
         );
+      case 'exports':
+        return adminOnly(
+          <GlassViewWrapper title="Export Center" subtitle="Download reports and spreadsheets" onBack={() => handleViewChange('reports')}>
+            <ExportCenter companyId={companyId} />
+          </GlassViewWrapper>
+        );
+
       case 'targets':
       case 'users':
       case 'logs':
@@ -334,17 +355,16 @@ export function GlassMainApp() {
       case 'settings':
       case 'cashvault':
       case 'savings':
-      case 'exports':
       case 'invoices':
       case 'companies':
       case 'systemchat':
       case 'emergencyfund': {
-        const adminOnlyGeneralViews = ['savings', 'exports', 'invoices', 'companies', 'users', 'logs', 'emergencyfund', 'cashvault'];
+        const adminOnlyGeneralViews = ['savings', 'invoices', 'companies', 'users', 'logs', 'emergencyfund', 'cashvault'];
         if (adminOnlyGeneralViews.includes(currentView) && !isAdmin) {
           return adminOnly(<div />);
         }
 
-        const reportLinkedViews = ['exports', 'users', 'logs', 'companies'];
+        const reportLinkedViews = ['users', 'logs', 'companies'];
         const backHandler = reportLinkedViews.includes(currentView)
           ? () => handleViewChange('reports')
           : undefined;
