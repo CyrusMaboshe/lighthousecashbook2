@@ -14,28 +14,14 @@ import {
   Plus,
   Users,
   UserPlus,
-  Eye,
-  EyeOff,
-  ExternalLink,
-  TrendingUp,
-  TrendingDown,
-  Camera,
-  BarChart3,
-  Wallet,
   Trash2,
   AlertTriangle,
   Shield,
-  Zap,
-  Activity,
-  Layout,
-  LayoutGrid,
   ShieldCheck,
   Server,
   Globe,
   Settings,
   ArrowRightCircle,
-  Database,
-  Lock,
   Cpu
 } from 'lucide-react';
 import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
@@ -144,8 +130,6 @@ export function SuperAdminPanel() {
 
   const currentStats = {
     totalSectors: companies.length,
-    totalLiquidity: companyStats.reduce((s, c) => s + c.net_balance, 0),
-    totalOperations: companyStats.reduce((s, c) => s + c.total_transactions, 0)
   };
 
   return (
@@ -188,30 +172,16 @@ export function SuperAdminPanel() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4 duration-700">
-        <div className="glass-card p-6 bg-indigo-500/[0.02] border-indigo-500/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all" />
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Active Environments</h3>
-          <div className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none">
-            <SimpleCounter amount={currentStats.totalSectors} currency="" decimals={0} />
+      <div className="glass-card p-6 bg-indigo-500/[0.02] border-indigo-500/10 relative overflow-hidden animate-in slide-in-from-bottom-4 duration-700">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
+        <div className="flex items-center gap-6">
+          <div>
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Active Sectors</h3>
+            <div className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none">
+              <SimpleCounter amount={currentStats.totalSectors} currency="" decimals={0} />
+            </div>
+            <p className="text-[9px] font-black text-slate-600 uppercase mt-2 tracking-tighter">Isolated Company Environments</p>
           </div>
-          <p className="text-[9px] font-black text-slate-600 uppercase mt-4 tracking-tighter">Isolated Data Buckets</p>
-        </div>
-        <div className="glass-card p-6 bg-emerald-500/[0.02] border-emerald-500/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all" />
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Ecosystem Liquidity</h3>
-          <div className="text-4xl font-black text-emerald-400 tracking-tighter tabular-nums leading-none">
-            <SimpleCounter amount={currentStats.totalLiquidity} currency="ZMW" decimals={2} />
-          </div>
-          <p className="text-[9px] font-black text-slate-600 uppercase mt-4 tracking-tighter">Gross Aggregate Value</p>
-        </div>
-        <div className="glass-card p-6 bg-purple-500/[0.02] border-purple-500/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-2xl group-hover:bg-purple-500/10 transition-all" />
-          <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Neural Operations</h3>
-          <div className="text-4xl font-black text-white tracking-tighter tabular-nums leading-none">
-            <SimpleCounter amount={currentStats.totalOperations} currency="" decimals={0} />
-          </div>
-          <p className="text-[9px] font-black text-slate-600 uppercase mt-4 tracking-tighter">Protocol Density Index</p>
         </div>
       </div>
 
@@ -267,7 +237,6 @@ export function SuperAdminPanel() {
               </div>
             ) : (
               companies.map((company) => {
-                const stats = companyStats.find(s => s.company_id === company.id) || { total_cash_in: 0, total_cash_out: 0, net_balance: 0, total_pictures: 0, total_transactions: 0 };
                 return (
                   <div key={company.id} className="glass-card p-8 group hover:bg-white/[0.02] transition-all duration-500 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -281,21 +250,10 @@ export function SuperAdminPanel() {
                             <h3 className="text-3xl font-black text-white tracking-tighter uppercase italic leading-none">{company.display_name}</h3>
                             <Badge className="bg-indigo-500 text-white text-[8px] font-black h-4 px-1.5 uppercase italic tracking-widest">SECTOR PROTECTED</Badge>
                           </div>
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">ID: {company.name}</p>
-                          <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20">
-                              <TrendingUp className="w-3.5 h-3.5 text-green-400" />
-                              <span className="text-[13px] font-black text-white tabular-nums tracking-tighter">{stats.total_cash_in.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                              <TrendingDown className="w-3.5 h-3.5 text-rose-400" />
-                              <span className="text-[13px] font-black text-white tabular-nums tracking-tighter">{stats.total_cash_out.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
-                              <Activity className="w-3.5 h-3.5 text-indigo-400" />
-                              <span className="text-[13px] font-black text-white tabular-nums tracking-tighter">{stats.total_transactions} OPS</span>
-                            </div>
-                          </div>
+                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">ID: {company.name}</p>
+                          {company.description && (
+                            <p className="text-[10px] text-slate-600 mt-2 max-w-md">{company.description}</p>
+                          )}
                         </div>
                       </div>
 
