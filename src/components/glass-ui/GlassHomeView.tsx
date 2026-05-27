@@ -25,9 +25,10 @@ interface GlassHomeViewProps {
   onViewChange: (view: GlassView) => void;
   onCashIn: () => void;
   onCashOut: () => void;
+  companyId?: string;
 }
 
-export function GlassHomeView({ onViewChange, onCashIn, onCashOut }: GlassHomeViewProps) {
+export function GlassHomeView({ onViewChange, onCashIn, onCashOut, companyId }: GlassHomeViewProps) {
   const [showPasswordDialog, setShowPasswordDialog] = React.useState(false);
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
@@ -42,7 +43,7 @@ export function GlassHomeView({ onViewChange, onCashIn, onCashOut }: GlassHomeVi
   const { transactions, updateTransaction, deleteTransaction } = useTransactions();
   const { systemState } = useSystemBalance();
   const { balance: vaultBalance } = useCashvault();
-  const { savingsBalance } = useSavings();
+  const { savingsBalance } = useSavings({ companyId });
   const { isAdmin, currentUser, systemSettings } = useAuth();
   const { categories, addCategory } = useCategories();
   const { preferences, updatePreferences, loading: preferencesLoading } = useUserPreferences();
@@ -238,6 +239,7 @@ export function GlassHomeView({ onViewChange, onCashIn, onCashOut }: GlassHomeVi
             cashVaultBalance={vaultBalance?.current_balance || 0}
             savingsBalance={savingsBalance?.current_balance || 0}
             onTotalReserveClick={handleTotalReserveRequest}
+            companyId={companyId}
           />
         </div>
 

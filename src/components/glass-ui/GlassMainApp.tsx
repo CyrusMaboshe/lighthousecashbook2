@@ -310,7 +310,7 @@ export function GlassMainApp() {
       case 'reserve-investment':
         return (
           <GlassViewWrapper>
-            <ReserveInvestmentView />
+            <ReserveInvestmentView companyId={companyId} />
           </GlassViewWrapper>
         );
 
@@ -361,7 +361,12 @@ export function GlassMainApp() {
       case 'emergencyfund': {
         const adminOnlyGeneralViews = ['savings', 'invoices', 'companies', 'users', 'logs', 'emergencyfund', 'cashvault'];
         if (adminOnlyGeneralViews.includes(currentView) && !isAdmin) {
-          return adminOnly(<div />);
+          // Allow company users to see their savings vault
+          if (currentView === 'savings' && isCompanyUser) {
+            // Permit
+          } else {
+            return adminOnly(<div />);
+          }
         }
 
         const reportLinkedViews = ['users', 'logs', 'companies'];
@@ -374,6 +379,7 @@ export function GlassMainApp() {
             <AdminViews
               currentView={currentView as any}
               currentUser={currentUser}
+              companyId={companyId}
             />
           </GlassViewWrapper>
         );
@@ -385,6 +391,7 @@ export function GlassMainApp() {
             onViewChange={handleViewChange}
             onCashIn={handleCashIn}
             onCashOut={handleCashOut}
+            companyId={companyId}
           />
         );
     }

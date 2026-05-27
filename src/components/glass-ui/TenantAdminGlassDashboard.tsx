@@ -33,6 +33,7 @@ import { StudioDocuments } from '@/components/studio-documents/StudioDocuments';
 import { CorePlanView } from '@/components/core-plan/CorePlanView';
 import { TargetsView } from '@/components/views/TargetsView';
 import { ReserveInvestmentView } from '@/components/views/ReserveInvestmentView';
+import { SavingsView } from '@/components/views/SavingsView';
 import { ExportCenter } from '@/components/export/ExportCenter';
 
 import {
@@ -215,6 +216,7 @@ function TenantAdminActionGrid({
         { id: 'targets', icon: Target, label: 'Milestones', subtitle: 'Goals', iconColor: 'text-cyan-400', view: 'targets' },
         { id: 'analytics', icon: BarChart3, label: 'Insights', subtitle: 'Analytics', iconColor: 'text-purple-400', view: 'analytics' },
         { id: 'reports', icon: FileText, label: 'Financials', subtitle: 'Reports', iconColor: 'text-blue-400', view: 'reports' },
+        { id: 'savings', icon: PiggyBank, label: 'Savings', subtitle: 'Company savings', iconColor: 'text-rose-400', view: 'savings' },
         { id: 'exports', icon: Download, label: 'Export Center', subtitle: 'Download data', iconColor: 'text-emerald-400', view: 'exports' },
         { id: 'logs', icon: Activity, label: 'Activity', subtitle: 'Logs', iconColor: 'text-slate-400', view: 'userlogs' },
         { id: 'settings', icon: Settings, label: 'Branding', subtitle: 'Settings', iconColor: 'text-slate-400', view: 'settings' },
@@ -517,10 +519,18 @@ export function TenantAdminGlassDashboard() {
                         <UniversalPasswordChange />
                     </div>
                 );
+            case 'savings':
+                return (
+                    <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
+                        <GlassViewWrapper title="Company Savings" subtitle="Regulated capital reserve" onBack={() => handleViewChange('home')}>
+                            <SavingsView currentUser={auth.user} companyId={companyId} />
+                        </GlassViewWrapper>
+                    </div>
+                );
             case 'reserve-investment':
                 return (
                     <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
-                        <ReserveInvestmentView forceAdmin={true} />
+                        <ReserveInvestmentView forceAdmin={true} companyId={companyId} />
                     </div>
                 );
             case 'studiodocuments':

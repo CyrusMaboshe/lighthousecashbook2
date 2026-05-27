@@ -25,12 +25,13 @@ interface GlassActionGridProps {
   cashVaultBalance?: number;
   savingsBalance?: number;
   onTotalReserveClick?: () => void;
+  companyId?: string;
 }
 
 export function GlassActionGrid({
   onViewChange, onCashIn, onCashOut, isAdmin,
   cashVaultBalance = 0, savingsBalance = 0,
-  onTotalReserveClick
+  onTotalReserveClick, companyId
 }: GlassActionGridProps) {
   const totalReserve = (cashVaultBalance || 0) + (savingsBalance || 0);
 
@@ -56,7 +57,9 @@ export function GlassActionGrid({
     { id: 'rent-reserved', icon: Home, label: 'Rent Reserved', subtitle: 'Target: 550', iconColor: 'text-purple-400', view: 'rent-reserved' },
   ];
 
-  const visibleActions = actions.filter(a => !a.adminOnly || isAdmin);
+  const visibleActions = actions.filter(
+    a => !a.adminOnly || isAdmin || (a.id === 'savings' && !!companyId) || (a.id === 'exports' && !!companyId)
+  );
 
   const getColorClasses = (iconColor: string) => {
     const color = iconColor.replace('text-', '').replace('-400', '');

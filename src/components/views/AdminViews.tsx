@@ -22,9 +22,10 @@ import { User } from '@/types/auth';
 interface AdminViewsProps {
   currentView: 'transactions' | 'targets' | 'users' | 'logs' | 'userlogs' | 'settings' | 'reports' | 'cashvault' | 'savings' | 'exports' | 'invoices' | 'companies' | 'usersummary' | 'systemchat' | 'emergencyfund';
   currentUser?: User;
+  companyId?: string;
 }
 
-export function AdminViews({ currentView, currentUser }: AdminViewsProps) {
+export function AdminViews({ currentView, currentUser, companyId }: AdminViewsProps) {
   try {
     switch (currentView) {
       case 'users':
@@ -42,7 +43,7 @@ export function AdminViews({ currentView, currentUser }: AdminViewsProps) {
       case 'cashvault':
         return <CashvaultView />;
       case 'savings':
-        return currentUser ? <SavingsView currentUser={currentUser} /> : null;
+        return currentUser ? <SavingsView currentUser={currentUser} companyId={companyId} /> : null;
       case 'exports':
         return <ExportCenter />;
       case 'invoices':

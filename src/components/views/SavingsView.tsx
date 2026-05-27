@@ -30,11 +30,12 @@ import { exportSavingsTransactionsToPDF } from '@/utils/savingsPdfExport';
 
 interface SavingsViewProps {
   currentUser: User;
+  companyId?: string;
 }
 
-export const SavingsView: React.FC<SavingsViewProps> = ({ currentUser }) => {
+export const SavingsView: React.FC<SavingsViewProps> = ({ currentUser, companyId }) => {
   const isMobile = useIsMobile();
-  const isAdmin = currentUser.role === 'admin';
+  const isAdmin = companyId ? true : currentUser.role === 'admin';
   const {
     savingsBalance,
     transactions,
@@ -43,7 +44,8 @@ export const SavingsView: React.FC<SavingsViewProps> = ({ currentUser }) => {
     withdrawFromSavings,
   } = useSavings({
     userId: currentUser.id,
-    isAdmin: isAdmin
+    isAdmin: isAdmin,
+    companyId: companyId
   });
 
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
@@ -122,7 +124,7 @@ export const SavingsView: React.FC<SavingsViewProps> = ({ currentUser }) => {
               </div>
               <div>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-none">
-                  Savings Vault
+                  {companyId ? "Company Savings Vault" : "Savings Vault"}
                 </h1>
                 <p className="text-xs text-slate-400 font-medium mt-1.5 flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />

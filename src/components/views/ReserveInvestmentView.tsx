@@ -275,11 +275,13 @@ function AdminReservePanel({
     allocations,
     config,
     onRefresh,
+    companyId,
 }: {
     totalReserve: number;
     allocations: Allocation[];
     config: ReserveConfig | null;
     onRefresh: () => void;
+    companyId?: string;
 }) {
     const { toast } = useToast();
     const { currentUser } = useAuth();
@@ -432,7 +434,7 @@ function AdminReservePanel({
             const newManualAmount = isManualMode ? studioAmt : null;
 
             const payload: any = {
-                id: 'singleton',
+                id: companyId || 'singleton',
                 savings_percent: newSavingsPercent,
                 manual_studio_amount: newManualAmount,
                 updated_by: currentUser?.username || 'admin',
@@ -495,15 +497,20 @@ function AdminReservePanel({
     const loadAllWithdrawals = async () => {
         setLoadingTx(true);
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('reserve_investment_withdrawals' as any)
-                .select('*')
-                // Defensive: ensure we only get records that are definitely not marked for deletion
-                // if any such system is in place, and ensure consistent order
-                .order('created_at', { ascending: false });
+                .select('*, reserve_investment_allocations!inner(company_id, id)');
+
+            if (companyId) {
+                query = query.eq('reserve_investment_allocations.company_id', companyId);
+            } else {
+                query = query.is('reserve_investment_allocations.company_id', null);
+            }
+
+            const { data, error } = await query.order('created_at', { ascending: false });
             
             if (!error && data) {
-                setAllWithdrawals(data as ReserveWithdrawal[]);
+                setAllWithdrawals(data as any as ReserveWithdrawal[]);
             }
         } catch (e) {
             console.error('Error loading admin reserve withdrawals:', e);
@@ -516,7 +523,7 @@ function AdminReservePanel({
     useEffect(() => {
         loadAllWithdrawals();
         const sub = supabase
-            .channel(`admin-reserve-withdrawals-${Math.random().toString(36).substring(2, 9)}`)
+            .channel(`admin-reserve-withdrawals-${companyId || 'global'}`)
             .on('postgres_changes', { 
                 event: '*', 
                 schema: 'public', 
@@ -530,7 +537,7 @@ function AdminReservePanel({
             })
             .subscribe();
         return () => { supabase.removeChannel(sub); };
-    }, []);
+    }, [companyId]);
 
     const openEditTx = (tx: ReserveWithdrawal) => {
         setEditingTx(tx);
@@ -647,7 +654,7 @@ function AdminReservePanel({
             const { data: configData } = await supabase
                 .from('reserve_investment_config' as any)
                 .select('total_reserve')
-                .eq('id', 'singleton')
+                .eq('id', companyId || 'singleton')
                 .single();
             
             if (configData) {
@@ -658,7 +665,7 @@ function AdminReservePanel({
                         total_reserve: refreshedConfigTotal, 
                         updated_at: new Date().toISOString() 
                     })
-                    .eq('id', 'singleton');
+                    .eq('id', companyId || 'singleton');
                 console.log('[Reserve] Restored global total');
             }
 
@@ -683,24 +690,25 @@ function AdminReservePanel({
             }
 
             // ── Step 4: Purge from main transactions table (Sync Parity) ──
-            // PostgREST `or` filters do NOT accept quoted values with commas;
-            // run two scoped deletes instead so spaces in the category don't
-            // break the filter and leave orphan rows behind.
-            await supabase
-                .from('transactions')
+            const txTable = companyId ? 'mt_company_transactions' : 'transactions';
+            const compQuery = companyId ? (q: any) => q.eq('company_id', companyId) : (q: any) => q;
+
+            await compQuery(supabase
+                .from(txTable as any)
                 .delete()
                 .eq('amount', tx.amount)
                 .eq('date', tx.date)
-                .eq('category_name', 'Reserve Investment Withdrawal');
-            await supabase
-                .from('transactions')
+                .eq('category_name', 'Reserve Investment Withdrawal'));
+                
+            await compQuery(supabase
+                .from(txTable as any)
                 .delete()
                 .eq('amount', tx.amount)
                 .eq('date', tx.date)
-                .ilike('details', '%Reserve Investment%');
+                .ilike('details', '%Reserve Investment%'));
 
             // ── Step 5: Purge from savings_transactions table (Savings Parity) ──
-            await supabase
+            const purgeSavingsQuery = supabase
                 .from('savings_transactions')
                 .delete()
                 .match({
@@ -708,6 +716,12 @@ function AdminReservePanel({
                     amount: tx.amount,
                     date: tx.date
                 });
+                
+            if (companyId) {
+                await purgeSavingsQuery.eq('tenant_id', companyId);
+            } else {
+                await purgeSavingsQuery;
+            }
 
 
             toast({ 
@@ -839,6 +853,7 @@ function AdminReservePanel({
                 notes: allocForm.notes || null,
                 is_active: true,
                 updated_at: new Date().toISOString(),
+                company_id: companyId || null,
             };
 
             if (editingAlloc) {
@@ -1972,6 +1987,7 @@ function UserReservePanel({
     allUserAllocations,
     config,
     onRefresh,
+    companyId,
 }: {
     totalReserve: number;
     allocation: Allocation | null;
@@ -1979,6 +1995,7 @@ function UserReservePanel({
     allUserAllocations: Allocation[];
     config: ReserveConfig | null;
     onRefresh: () => void;
+    companyId?: string;
 }) {
     const { toast } = useToast();
     const { currentUser } = useAuth();
@@ -1996,14 +2013,21 @@ function UserReservePanel({
         setLoadingWithdrawals(true);
         try {
             const username = currentUser?.username || '';
-            const { data, error } = await supabase
+            let query = supabase
                 .from('reserve_investment_withdrawals' as any)
-                .select('*')
-                .or(`user_id.eq.${username},user_display_name.eq.${username}`)
-                .order('created_at', { ascending: false });
+                .select('*, reserve_investment_allocations!inner(company_id, id)')
+                .or(`user_id.eq.${username},user_display_name.eq.${username}`);
+
+            if (companyId) {
+                query = query.eq('reserve_investment_allocations.company_id', companyId);
+            } else {
+                query = query.is('reserve_investment_allocations.company_id', null);
+            }
+
+            const { data, error } = await query.order('created_at', { ascending: false });
             
             if (!error && data) {
-                setWithdrawals(data as ReserveWithdrawal[]);
+                setWithdrawals(data as any as ReserveWithdrawal[]);
             }
         } catch (err) {
             console.error('Error loading reserve withdrawals:', err);
@@ -2015,7 +2039,7 @@ function UserReservePanel({
     useEffect(() => {
         loadWithdrawals();
         const sub = supabase
-            .channel(`reserve-withdrawals-user-${Math.random().toString(36).substring(2, 9)}`)
+            .channel(`reserve-withdrawals-user-${companyId || 'global'}`)
             .on('postgres_changes', { 
                 event: '*', 
                 schema: 'public', 
@@ -2029,7 +2053,7 @@ function UserReservePanel({
             })
             .subscribe();
         return () => { supabase.removeChannel(sub); };
-    }, [currentUser?.username]);
+    }, [currentUser?.username, companyId]);
 
     if (allUserAllocations.length === 0) {
         return (
@@ -2168,38 +2192,64 @@ function UserReservePanel({
                     total_reserve: totalReserve - amount,
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', 'singleton');
+                .eq('id', companyId || 'singleton');
             if (cErr) console.error('[Reserve] Global total sync error:', cErr);
 
             // 4. Record in main transaction history (Dashboard totals)
+            const txTable = companyId ? 'mt_company_transactions' : 'transactions';
+            const mainTxPayload: any = {
+                type: 'cash-out',
+                category_name: 'Reserve Investment Withdrawal',
+                customer_name: username,
+                amount,
+                added_by: username,
+                added_by_user_id: currentUser?.id || '00000000-0000-0000-0000-000000000000',
+                date: today,
+                details: `Reserve Investment cash-out: ${withdrawDescription || 'Personal withdrawal'}.`,
+            };
+            if (companyId) {
+                mainTxPayload.company_id = companyId;
+                mainTxPayload.time = format(new Date(), 'HH:mm');
+            }
             const { error: tErr } = await supabase
-                .from('transactions')
-                .insert({
-                    type: 'cash-out',
-                    category_name: 'Reserve Investment Withdrawal',
-                    customer_name: username,
-                    amount,
-                    added_by: username,
-                    added_by_user_id: currentUser?.id || null,
-                    date: today,
-                    details: `Reserve Investment cash-out: ${withdrawDescription || 'Personal withdrawal'}.`,
-                });
+                .from(txTable as any)
+                .insert(mainTxPayload);
             if (tErr) console.error('[Reserve] Main history sync error:', tErr);
 
             // 5. Deduct from persistent savings pool (Savings totals)
+            const savingsTxPayload: any = {
+                action_type: 'withdrawal',
+                amount,
+                description: `Reserve Investment: ${withdrawDescription || 'Withdrawal'} - ${username}`,
+                initiating_user: username,
+                initiating_user_id: currentUser?.id || null,
+                balance_before: availableToWithdraw,
+                balance_after: availableToWithdraw - amount,
+                date: today,
+                user_id: currentUser?.id || null,
+            };
+            if (companyId) {
+                savingsTxPayload.tenant_id = companyId;
+                savingsTxPayload.time = format(new Date(), 'HH:mm');
+            }
             const { error: sErr } = await supabase
                 .from('savings_transactions')
-                .insert({
-                    action_type: 'withdrawal',
-                    amount,
-                    description: `Reserve Investment: ${withdrawDescription || 'Withdrawal'} - ${username}`,
-                    initiating_user: username,
-                    initiating_user_id: currentUser?.id || null,
-                    balance_before: availableToWithdraw,
-                    balance_after: availableToWithdraw - amount,
-                    date: today,
-                });
+                .insert(savingsTxPayload);
             if (sErr) console.error('[Reserve] Savings sync error:', sErr);
+
+            // 6. Update savings balance for company
+            if (companyId) {
+                const { error: uErr } = await supabase
+                    .from('savings_balance')
+                    .upsert({
+                        tenant_id: companyId,
+                        current_balance: availableToWithdraw - amount,
+                        updated_by: username,
+                        updated_by_user_id: currentUser?.id || null,
+                        last_updated: new Date().toISOString()
+                    }, { onConflict: 'tenant_id' });
+                if (uErr) console.error('[Reserve] Savings balance update error:', uErr);
+            }
 
             toast({ title: '✅ Withdrawal Successful', description: `ZMW ${amount.toFixed(2)} withdrawn. All system totals updated.` });
             setWithdrawDialogOpen(false);
@@ -2777,9 +2827,10 @@ interface ReserveInvestmentViewProps {
     currentUser?: { username?: string; role?: string; id?: string } | null;
     /** Force admin view regardless of currentUser.role (for MTAdmin panels) */
     forceAdmin?: boolean;
+    companyId?: string;
 }
 
-export function ReserveInvestmentView({ currentUser, forceAdmin = false }: ReserveInvestmentViewProps) {
+export function ReserveInvestmentView({ currentUser, forceAdmin = false, companyId }: ReserveInvestmentViewProps) {
     const { currentUser: authUser, isAdmin: authIsAdmin } = useAuth();
     const { toast } = useToast();
 
@@ -2801,7 +2852,7 @@ export function ReserveInvestmentView({ currentUser, forceAdmin = false }: Reser
     // config.total_reserve so that user views (which are RLS-restricted) can read
     // the stored value instead of computing it themselves.
     const { balance: vaultBalance } = useCashvault();
-    const { savingsBalance } = useSavings({ isAdmin: true });
+    const { savingsBalance } = useSavings({ isAdmin: true, companyId });
 
     // The fallback total derived from live balances (admin-visible only)
     const vaultBal = vaultBalance?.current_balance || 0;
@@ -2811,17 +2862,44 @@ export function ReserveInvestmentView({ currentUser, forceAdmin = false }: Reser
     const loadData = async () => {
         setLoading(true);
         try {
+            const configId = companyId || 'singleton';
             const { data: configData, error: configErr } = await supabase
                 .from('reserve_investment_config' as any)
                 .select('*')
-                .eq('id', 'singleton')
-                .single();
+                .eq('id', configId)
+                .maybeSingle();
 
-            if (!configErr && configData) setConfig(configData as ReserveConfig);
+            if (!configErr && configData) {
+                setConfig(configData as ReserveConfig);
+            } else if (companyId) {
+                // Initialize default config for company
+                const { data: newConfig, error: insErr } = await supabase
+                    .from('reserve_investment_config' as any)
+                    .insert({
+                        id: companyId,
+                        total_reserve: 0,
+                        savings_percent: 10.00,
+                        notes: 'Company Reserve Investment Config',
+                        updated_by: 'system'
+                    })
+                    .select()
+                    .maybeSingle();
+                if (newConfig) {
+                    setConfig(newConfig as ReserveConfig);
+                }
+            }
 
-            const { data: allocData, error: allocErr } = await supabase
+            let allocQuery = supabase
                 .from('reserve_investment_allocations' as any)
-                .select('*')
+                .select('*');
+
+            if (companyId) {
+                allocQuery = allocQuery.eq('company_id', companyId);
+            } else {
+                allocQuery = allocQuery.is('company_id', null);
+            }
+
+            const { data: allocData, error: allocErr } = await allocQuery
                 // Fetch ALL allocations (not just is_active=true) for full history in Total Allocations tab
                 .order('created_at', { ascending: true });
 
@@ -2851,18 +2929,18 @@ export function ReserveInvestmentView({ currentUser, forceAdmin = false }: Reser
     useEffect(() => {
         loadData();
         const configSub = supabase
-            .channel(`reserve-config-changes-${Math.random().toString(36).substring(2, 9)}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'reserve_investment_config' }, loadData)
+            .channel(`reserve-config-changes-${companyId || 'global'}`)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'reserve_investment_config', filter: companyId ? `id=eq.${companyId}` : `id=eq.singleton` }, loadData)
             .subscribe();
         const allocSub = supabase
-            .channel(`reserve-alloc-changes-${Math.random().toString(36).substring(2, 9)}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'reserve_investment_allocations' }, loadData)
+            .channel(`reserve-alloc-changes-${companyId || 'global'}`)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'reserve_investment_allocations', filter: companyId ? `company_id=eq.${companyId}` : undefined }, loadData)
             .subscribe();
         return () => {
             supabase.removeChannel(configSub);
             supabase.removeChannel(allocSub);
         };
-    }, [resolvedUser?.username]);
+    }, [resolvedUser?.username, companyId]);
 
     // ── Continuously sync live total to config so users (RLS-restricted) can read it ──
     // Admin sessions can read vaultBalance + savingsBalance; non-admin sessions
@@ -3024,6 +3102,7 @@ export function ReserveInvestmentView({ currentUser, forceAdmin = false }: Reser
             allocations={allocations}
             config={config}
             onRefresh={loadData}
+            companyId={companyId}
         />
     ) : (
         <UserReservePanel
@@ -3032,6 +3111,7 @@ export function ReserveInvestmentView({ currentUser, forceAdmin = false }: Reser
             allUserAllocations={userAllocations}
             config={config}
             onRefresh={loadData}
+            companyId={companyId}
         />
     );
 }
