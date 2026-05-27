@@ -22,6 +22,8 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
+import { useTenant } from '@/contexts/TenantContext';
 import { PerformanceOverview } from './PerformanceOverview';
 import { RevenueAnalytics } from './RevenueAnalytics';
 import { CustomerInsights } from './CustomerInsights';
@@ -65,8 +67,17 @@ export function SmartAnalysis({ transactions: transactionsProp }: SmartAnalysisP
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { toast } = useToast();
   const standardTxResult = useTransactions();
-  const transactions = transactionsProp !== undefined ? transactionsProp : standardTxResult.transactions;
-  const transactionsLoading = transactionsProp !== undefined ? false : standardTxResult.loading;
+  const { currentCompany } = useMultiTenantAuth();
+  const { tenantId } = useTenant();
+  const companyId = currentCompany?.id || tenantId;
+
+  const transactions = transactionsProp !== undefined 
+    ? transactionsProp 
+    : (companyId ? [] : standardTxResult.transactions);
+
+  const transactionsLoading = transactionsProp !== undefined 
+    ? false 
+    : (companyId ? false : standardTxResult.loading);
   const channelRef = useRef<any>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastProcessedHashRef = useRef<string>('');

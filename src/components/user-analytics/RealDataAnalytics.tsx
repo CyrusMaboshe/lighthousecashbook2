@@ -30,6 +30,8 @@ import {
   DollarSign
 } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
+import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/hooks/useAuth';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Cell, LineChart as RechartsLineChart, Line, Area, AreaChart } from 'recharts';
 
@@ -93,7 +95,11 @@ interface RealAnalyticsData {
   dataCompleteness: number;
 }
 
-export function RealDataAnalytics() {
+interface RealDataAnalyticsProps {
+  transactions?: any[];
+}
+
+export function RealDataAnalytics({ transactions: transactionsProp }: RealDataAnalyticsProps = {}) {
   const [activeTab, setActiveTab] = useState('overview');
   const [analyticsData, setAnalyticsData] = useState<RealAnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,7 +107,19 @@ export function RealDataAnalytics() {
   const [showBalances, setShowBalances] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
-  const { transactions, loading: transactionsLoading } = useTransactions();
+  const standardTxResult = useTransactions();
+  const { currentCompany } = useMultiTenantAuth();
+  const { tenantId } = useTenant();
+  const companyId = currentCompany?.id || tenantId;
+
+  const transactions = transactionsProp !== undefined 
+    ? transactionsProp 
+    : (companyId ? [] : standardTxResult.transactions);
+
+  const transactionsLoading = transactionsProp !== undefined 
+    ? false 
+    : (companyId ? false : standardTxResult.loading);
+
   const { currentUser } = useAuth();
 
   // Process 100% real data from transactions

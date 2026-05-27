@@ -18,6 +18,8 @@ import { LegacyAllTimeUserCashSummary } from '@/components/views/LegacyAllTimeUs
 import { ReportsLayout } from '@/components/ReportsClean';
 import { StudioDocuments } from '@/components/studio-documents/StudioDocuments';
 import { useMTTransactionAdapter } from '@/hooks/useMTTransactionAdapter';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
+import { CustomerAnalytics } from '@/components/company/CustomerAnalytics';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/contexts/TenantContext';
@@ -72,8 +74,13 @@ export function GlassMainApp() {
 
   // Global admin-controlled month — read-only for regular users
   const { month: selectedMonth, year: selectedYear } = useGlobalMonthControl();
-  const { tenantId, company } = useTenant();
-  const companyName = company?.name || 'Lighthouse';
+  const { tenantId: supabaseTenantId, company: supabaseCompany } = useTenant();
+  const { currentCompany: mtCompany, currentUser: mtUser } = useMultiTenantAuth();
+
+  const companyId = supabaseTenantId || mtCompany?.id;
+  const company = supabaseCompany || mtCompany;
+  const isCompanyUser = !!companyId;
+  const companyName = company?.display_name || company?.name || 'Lighthouse';
 
   const { currentUser, isAdmin, logout, systemSettings, logAdminAction } = useAuth();
 
@@ -191,7 +198,7 @@ export function GlassMainApp() {
   const displayTransactions = isAdmin ? filteredTransactions : userSpecificTransactions;
 
   const adminOnly = (children: React.ReactNode) => {
-    if (isAdmin) return children;
+    if (isAdmin || isCompanyUser) return children;
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-white/50 backdrop-blur-md rounded-2xl border border-red-100 mt-10">
         <Shield className="w-16 h-16 text-red-500 mb-4" />
@@ -248,13 +255,13 @@ export function GlassMainApp() {
         );
 
       case 'reports':
-        return <GlassReportsView onViewChange={handleViewChange} />;
+        return <GlassReportsView onViewChange={handleViewChange} isCompanyUser={isCompanyUser} />;
 
       case 'financialreports':
         return adminOnly(
           <GlassViewWrapper title="Financial Reports" subtitle="Monthly & yearly summaries" onBack={() => handleViewChange('reports')}>
-            {tenantId ? (
-              <MTGlassReportsView companyId={tenantId} currentUserEmail={currentUser?.email} />
+            {companyId ? (
+              <MTGlassReportsView companyId={companyId} currentUserEmail={currentUser?.email || mtUser?.email} />
             ) : (
               <ReportsLayout
                 transactions={transactions}
@@ -271,7 +278,11 @@ export function GlassMainApp() {
       case 'analytics':
         return adminOnly(
           <GlassViewWrapper title="Analytics" subtitle="View your financial insights" onBack={() => handleViewChange('reports')}>
-            <UserAnalytics />
+            {companyId ? (
+              <CustomerAnalytics selectedMonth={selectedMonth} />
+            ) : (
+              <UserAnalytics />
+            )}
           </GlassViewWrapper>
         );
 

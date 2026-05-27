@@ -16,9 +16,10 @@ interface ReportItem {
 
 interface GlassReportsViewProps {
   onViewChange: (view: GlassView) => void;
+  isCompanyUser?: boolean;
 }
 
-export function GlassReportsView({ onViewChange }: GlassReportsViewProps) {
+export function GlassReportsView({ onViewChange, isCompanyUser = false }: GlassReportsViewProps) {
   const { isAdmin } = useAuth();
 
   const reportItems: ReportItem[] = [
@@ -33,7 +34,12 @@ export function GlassReportsView({ onViewChange }: GlassReportsViewProps) {
     { id: 'customers', icon: Users, label: 'Customers', subtitle: 'Customer acquisition and history', view: 'customers', iconBg: 'bg-cyan-500/15', iconColor: 'text-cyan-400', adminOnly: false },
   ];
 
-  const visibleItems = reportItems.filter(item => !item.adminOnly || isAdmin);
+  const visibleItems = reportItems.filter(item => {
+    if (!item.adminOnly) return true;
+    if (isAdmin) return true;
+    if (isCompanyUser && (item.id === 'reports' || item.id === 'exports')) return true;
+    return false;
+  });
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

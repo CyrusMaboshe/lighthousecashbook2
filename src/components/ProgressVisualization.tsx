@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Maximize2, X } from 'lucide-react';
 
-export function ProgressVisualization({ transactions, userContext }: ProgressVisualizationProps) {
+export function ProgressVisualization({ transactions = [], userContext }: ProgressVisualizationProps) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [viewType, setViewType] = useState<ViewType>('monthly');

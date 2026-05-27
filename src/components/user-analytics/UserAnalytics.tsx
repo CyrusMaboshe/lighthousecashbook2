@@ -138,9 +138,13 @@ interface RealTimeAnalyticsData {
 
 import { RealDataAnalytics } from './RealDataAnalytics';
 
-export function UserAnalytics() {
+interface UserAnalyticsProps {
+  transactions?: any[];
+}
+
+export function UserAnalytics({ transactions }: UserAnalyticsProps = {}) {
   // Use the new 100% real data analytics component
-  return <RealDataAnalytics />;
+  return <RealDataAnalytics transactions={transactions} />;
 }
 
 export function UserAnalyticsLegacy() {

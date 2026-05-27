@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Calendar, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
+import { useTenant } from '@/contexts/TenantContext';
 import { AnimatedNumber } from '@/components/common/AnimatedNumber';
 import { cn } from '@/lib/utils';
 import { isRefundCategory } from '@/utils/refundUtils';
@@ -34,7 +36,13 @@ export function MonthlyBalanceSummary({
   transactions: transactionsProp,
 }: MonthlyBalanceSummaryProps) {
   const standardTxResult = useTransactions();
-  const transactions = transactionsProp !== undefined ? transactionsProp : standardTxResult.transactions;
+  const { currentCompany } = useMultiTenantAuth();
+  const { tenantId } = useTenant();
+  const companyId = currentCompany?.id || tenantId;
+
+  const transactions = transactionsProp !== undefined 
+    ? transactionsProp 
+    : (companyId ? [] : standardTxResult.transactions);
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
 
   const monthNames = [
