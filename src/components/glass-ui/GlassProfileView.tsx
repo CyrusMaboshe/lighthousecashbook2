@@ -16,6 +16,7 @@ import { Camera, Sun, Moon } from 'lucide-react';
 import { useGlobalMonthControl } from '@/hooks/useGlobalMonthControl';
 import { format } from 'date-fns';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface ProfileMenuItem {
   id: string;
@@ -35,6 +36,8 @@ interface GlassProfileViewProps {
 
 export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewProps) {
   const { currentUser, isAdmin, refreshUserData } = useAuth();
+  const { company } = useTenant();
+  const companyName = company?.name || 'Lighthouse';
   const { toast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -457,7 +460,7 @@ export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewPro
       </AppleControlList>
 
       <GlassCard padding="sm" className="text-center">
-        <p className="text-xs text-slate-500">Lighthouse Media Cash Management v1.0</p>
+        <p className="text-xs text-slate-500">{companyName} Cash Management v1.0</p>
         <p className="text-xs text-slate-500">© 2024 All rights reserved</p>
       </GlassCard>
 

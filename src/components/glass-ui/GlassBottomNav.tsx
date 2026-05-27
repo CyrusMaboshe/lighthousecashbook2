@@ -57,7 +57,7 @@ export function GlassBottomNav({
         </div>
         {!isCollapsed && (
           <div className="glass-animate-fade-in truncate">
-            <h1 className="text-lg font-bold text-white/90 truncate">{companyName || "Lighthouse Media"}</h1>
+            <h1 className="text-lg font-bold text-white/90 truncate">{companyName || "Lighthouse"}</h1>
             <p className="text-xs text-slate-400">Admin Panel</p>
           </div>
         )}

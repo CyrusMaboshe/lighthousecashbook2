@@ -53,14 +53,20 @@ interface SmartAnalysisData {
   isUpdating: boolean;
 }
 
-export function SmartAnalysis() {
+interface SmartAnalysisProps {
+  transactions?: any[];
+}
+
+export function SmartAnalysis({ transactions: transactionsProp }: SmartAnalysisProps = {}) {
   const [data, setData] = useState<SmartAnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { toast } = useToast();
-  const { transactions, loading: transactionsLoading } = useTransactions();
+  const standardTxResult = useTransactions();
+  const transactions = transactionsProp !== undefined ? transactionsProp : standardTxResult.transactions;
+  const transactionsLoading = transactionsProp !== undefined ? false : standardTxResult.loading;
   const channelRef = useRef<any>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastProcessedHashRef = useRef<string>('');
@@ -137,6 +143,7 @@ export function SmartAnalysis() {
 
   // Set up real-time subscription for immediate updates
   useEffect(() => {
+    if (transactionsProp !== undefined) return;
     console.log('🚀 Setting up Smart Analysis real-time subscription');
 
     // Clean up existing channel
@@ -181,7 +188,7 @@ export function SmartAnalysis() {
       processingRef.current = false;
       lastProcessedHashRef.current = '';
     };
-  }, [debouncedUpdate]);
+  }, [debouncedUpdate, transactionsProp]);
 
   // Additional cleanup effect for component unmount
   useEffect(() => {

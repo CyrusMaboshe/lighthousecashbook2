@@ -26,10 +26,15 @@ interface MonthlyData {
 
 interface MonthlyBalanceSummaryProps {
   balancesVisible?: boolean;
+  transactions?: any[];
 }
 
-export function MonthlyBalanceSummary({ balancesVisible = true }: MonthlyBalanceSummaryProps) {
-  const { transactions } = useTransactions();
+export function MonthlyBalanceSummary({
+  balancesVisible = true,
+  transactions: transactionsProp,
+}: MonthlyBalanceSummaryProps) {
+  const standardTxResult = useTransactions();
+  const transactions = transactionsProp !== undefined ? transactionsProp : standardTxResult.transactions;
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
 
   const monthNames = [

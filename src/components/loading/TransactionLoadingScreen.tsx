@@ -95,7 +95,7 @@ export function TransactionLoadingScreen({
 
         <div className="mt-8 flex items-center justify-center gap-2">
           <div className={cn("h-px w-4", isLight ? "bg-slate-200" : "bg-slate-800")} />
-          <p className={cn("text-[9px] font-black uppercase tracking-[0.3em]", isLight ? "text-slate-400" : "text-slate-700")}>Lighthouse Financial Intelligence</p>
+          <p className={cn("text-[9px] font-black uppercase tracking-[0.3em]", isLight ? "text-slate-400" : "text-slate-700")}>Financial Intelligence Platform</p>
           <div className={cn("h-px w-4", isLight ? "bg-slate-200" : "bg-slate-800")} />
         </div>
       </div>

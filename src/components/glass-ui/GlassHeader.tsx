@@ -7,6 +7,7 @@ interface GlassHeaderProps {
   onLogout: () => void;
   onProfileClick?: () => void;
   showWelcome?: boolean;
+  companyName?: string;
 }
 
 export function GlassHeader({
@@ -14,7 +15,8 @@ export function GlassHeader({
   profilePictureUrl,
   onLogout,
   onProfileClick,
-  showWelcome = false
+  showWelcome = false,
+  companyName = 'Lighthouse'
 }: GlassHeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -62,7 +64,7 @@ export function GlassHeader({
             <span className="text-white text-lg font-bold absolute">L</span>
           </div>
           <div>
-            <h1 className="text-[17px] font-bold tracking-tight text-white/90">Lighthouse</h1>
+            <h1 className="text-[17px] font-bold tracking-tight text-white/90 truncate max-w-[160px]">{companyName}</h1>
             <p className="text-[10px] text-slate-500 uppercase tracking-[0.15em] font-bold">Finance Pro</p>
           </div>
         </div>

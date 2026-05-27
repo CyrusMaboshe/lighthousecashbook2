@@ -15,8 +15,9 @@ import { TransactionDetailDialog } from './TransactionDetailDialog';
 import { AdminViews } from '@/components/views/AdminViews';
 import { UserAnalytics } from '@/components/user-analytics/UserAnalytics';
 import { LegacyAllTimeUserCashSummary } from '@/components/views/LegacyAllTimeUserCashSummary';
-import { Reports } from '@/components/ReportsClean';
+import { ReportsLayout } from '@/components/ReportsClean';
 import { StudioDocuments } from '@/components/studio-documents/StudioDocuments';
+import { useMTTransactionAdapter } from '@/hooks/useMTTransactionAdapter';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useTenant } from '@/contexts/TenantContext';
@@ -29,6 +30,32 @@ import { useGlobalMonthControl } from '@/hooks/useGlobalMonthControl';
 import { CorePlanView } from '../core-plan/CorePlanView';
 import { ReserveInvestmentView } from '../views/ReserveInvestmentView';
 import { RentReservedView } from '../views/RentReservedView';
+
+// Shared Reports wrapper for multi-tenant users
+function MTGlassReportsView({
+  companyId,
+  currentUserEmail,
+}: {
+  companyId: string;
+  currentUserEmail?: string;
+}) {
+  const {
+    transactions,
+    categories,
+    loading,
+  } = useMTTransactionAdapter(companyId, ''); // empty selectedMonth fetches all transactions
+
+  return (
+    <ReportsLayout
+      transactions={transactions}
+      categories={categories}
+      loading={loading}
+      isCompanyView={true}
+      currentUser={currentUserEmail ? { email: currentUserEmail } : null}
+      hasSmartAnalysisAccess={currentUserEmail === 'jonahdjbreezy@gmail.com'}
+    />
+  );
+}
 
 export function GlassMainApp() {
   const [currentView, setCurrentView] = useState<GlassView>(() => {
@@ -46,7 +73,7 @@ export function GlassMainApp() {
   // Global admin-controlled month — read-only for regular users
   const { month: selectedMonth, year: selectedYear } = useGlobalMonthControl();
   const { tenantId, company } = useTenant();
-  const companyName = company?.name || 'Lighthouse Media';
+  const companyName = company?.name || 'Lighthouse';
 
   const { currentUser, isAdmin, logout, systemSettings, logAdminAction } = useAuth();
 
@@ -226,7 +253,18 @@ export function GlassMainApp() {
       case 'financialreports':
         return adminOnly(
           <GlassViewWrapper title="Financial Reports" subtitle="Monthly & yearly summaries" onBack={() => handleViewChange('reports')}>
-            <Reports />
+            {tenantId ? (
+              <MTGlassReportsView companyId={tenantId} currentUserEmail={currentUser?.email} />
+            ) : (
+              <ReportsLayout
+                transactions={transactions}
+                categories={categories}
+                loading={loading}
+                isCompanyView={false}
+                currentUser={currentUser}
+                hasSmartAnalysisAccess={currentUser?.email === 'jonahdjbreezy@gmail.com'}
+              />
+            )}
           </GlassViewWrapper>
         );
 

@@ -50,7 +50,7 @@ export function UnifiedLoginForm() {
 
       if (existingSuccess) {
         toast({
-          title: "Welcome to Lighthouse Media!",
+          title: "Login Successful",
           description: "Successfully logged into your account.",
         });
         setLoginSuccessState(true);
@@ -63,7 +63,7 @@ export function UnifiedLoginForm() {
 
       if (companySuccess) {
         toast({
-          title: "Welcome to Lighthouse Media!",
+          title: "Login Successful",
           description: "Successfully logged into your company account.",
         });
         setLoginSuccessState(true);
@@ -136,7 +136,7 @@ export function UnifiedLoginForm() {
           </h1>
           <div className="flex items-center gap-3">
             <div className={cn("h-px w-6 sm:w-8", isLight ? "bg-slate-300" : "bg-gradient-to-r from-transparent to-slate-600")} />
-            <p className={cn("text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em]", isLight ? "text-slate-400" : "text-slate-500")}>Lighthouse Media</p>
+            <p className={cn("text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em]", isLight ? "text-slate-400" : "text-slate-500")}>Financial Intelligence Platform</p>
             <div className={cn("h-px w-6 sm:w-8", isLight ? "bg-slate-300" : "bg-gradient-to-l from-transparent to-slate-600")} />
           </div>
         </div>
@@ -242,7 +242,7 @@ export function UnifiedLoginForm() {
             Official Financial Intelligence System
           </p>
           <p className={cn("text-[9px] sm:text-[10px] font-semibold", isLight ? "text-slate-400" : "text-slate-500/80")}>
-            &copy; {new Date().getFullYear()} Lighthouse Media Group
+            &copy; {new Date().getFullYear()} Smart Finance Platform
           </p>
         </div>
       </div>

@@ -97,6 +97,7 @@ export function GlassAppShell({
             onLogout={onLogout}
             onProfileClick={() => onViewChange('profile')}
             showWelcome={currentView === 'home'}
+            companyName={companyName}
           />
         </div>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useDeviceInfo } from '@/hooks/use-mobile';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface ModernMobileWrapperProps {
   children: React.ReactNode;
@@ -17,6 +18,8 @@ export function ModernMobileWrapper({
 }: ModernMobileWrapperProps) {
   const { isMobile } = useDeviceInfo();
   const [scrollProgress, setScrollProgress] = useState(0);
+  const { company } = useTenant();
+  const companyName = company?.name || 'Lighthouse';
 
   useEffect(() => {
     if (!isMobile || !showScrollIndicator) return;
@@ -42,7 +45,7 @@ export function ModernMobileWrapper({
       {showStatusBar && (
         <div className="mobile-status-bar">
           <div className="flex items-center justify-between">
-            <span>Lighthouse Media</span>
+            <span>{companyName}</span>
             <div className="flex items-center gap-2 text-xs">
               <div className="w-4 h-2 bg-white/30 rounded-sm">
                 <div className="w-3/4 h-full bg-white rounded-sm"></div>

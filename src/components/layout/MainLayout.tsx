@@ -13,6 +13,7 @@ import { ProfileManagementModal } from '@/components/profile/ProfileManagementMo
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { InstallPromptBanner } from '@/components/pwa/InstallPromptBanner';
 import { SystemChat, ChatButton } from '@/components/chat/SystemChat';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -54,6 +55,8 @@ export function MainLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [chatFullscreen, setChatFullscreen] = useState(false);
+  const { company } = useTenant();
+  const companyName = company?.name || 'Lighthouse';
 
   // Listen for profile modal open event from sidebar
   useEffect(() => {
@@ -181,7 +184,7 @@ export function MainLayout({
                           "font-bold text-foreground",
                           isMobile ? "text-lg" : "text-28px leading-tight"
                         )}>
-                          Lighthouse Media
+                          {companyName}
                         </h1>
                         <p className={cn(
                           "text-secondary-foreground font-medium",

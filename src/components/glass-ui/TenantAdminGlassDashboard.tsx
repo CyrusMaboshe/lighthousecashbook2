@@ -4,6 +4,7 @@
 // as the main Lighthouse GlassMainApp dashboard.
 
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
 import { useTenant } from '@/contexts/TenantContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,11 +13,19 @@ import { GlassViewWrapper } from './GlassViewWrapper';
 import { GlassBalanceHero } from './GlassBalanceHero';
 import { GlassTransactionList } from './GlassTransactionList';
 
+// Shared transactions UI — same component used by all roles
+import { GlassTransactionsView } from './GlassTransactionsView';
+import { TransactionModals } from '@/components/transactions/TransactionModals';
+import { TransactionDetailDialog } from './TransactionDetailDialog';
+import { useMTTransactionAdapter } from '@/hooks/useMTTransactionAdapter';
+import { useTransactionFilters } from '@/hooks/useTransactionFilters';
+import { Transaction } from '@/hooks/useTransactions';
+
 // Import all multi-tenant company views
 import { MTTransactionManager } from '@/components/company/MTTransactionManager';
 import { UserLogs } from '@/components/company/UserLogs';
 import { MTUserManagement } from '@/components/company/MTUserManagement';
-import { Reports } from '@/components/company/Reports';
+import { ReportsLayout } from '@/components/ReportsClean';
 import { CustomerAnalytics } from '@/components/company/CustomerAnalytics';
 import { CompanyBrandingManager } from '@/components/company/CompanyBrandingManager';
 import { UniversalPasswordChange } from '@/components/auth/UniversalPasswordChange';
@@ -32,6 +41,149 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import './GlassTheme.css';
+
+// ─── Shared Transactions View (wraps GlassTransactionsView with MT data) ──────
+/**
+ * MTGlassTransactionsView
+ * Renders the exact same GlassTransactionsView used by regular/admin users,
+ * but fed with data from mt_company_transactions via the adapter hook.
+ * Zero financial logic changes — only the UI source is unified.
+ */
+function MTGlassTransactionsView({
+  companyId,
+  selectedMonth,
+}: {
+  companyId: string;
+  selectedMonth: string;
+}) {
+  const [year, monthStr] = selectedMonth.split('-');
+  const selectedYear = parseInt(year);
+  const selectedMonthNum = parseInt(monthStr) - 1; // 0-indexed for useTransactionFilters
+
+  const {
+    transactions,
+    categories,
+    loading,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    addCategory,
+  } = useMTTransactionAdapter(companyId, selectedMonth);
+
+  const { filters, setFilters, getFilteredTransactions } = useTransactionFilters(
+    transactions,
+    selectedYear,
+    selectedMonthNum
+  );
+
+  const [showTransactionForm, setShowTransactionForm] = useState(false);
+  const [transactionType, setTransactionType] = useState<'cash-in' | 'cash-out'>('cash-in');
+  const [newlyCreatedTransaction, setNewlyCreatedTransaction] = useState<Transaction | null>(null);
+  const [showNewTransactionDetail, setShowNewTransactionDetail] = useState(false);
+
+  const handleAddTransaction = async (tx: Omit<Transaction, 'id' | 'added_by'>) => {
+    setShowTransactionForm(false);
+    const added = await addTransaction({
+      ...tx,
+      time: tx.time || format(new Date(), 'HH:mm'),
+    });
+    if (added && added.type === 'cash-in') {
+      setNewlyCreatedTransaction(added);
+      setShowNewTransactionDetail(true);
+    }
+  };
+
+  const filteredTransactions = getFilteredTransactions();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-400 text-sm">Loading transactions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <GlassTransactionsView
+        transactions={transactions}
+        filteredTransactions={filteredTransactions}
+        filters={filters}
+        onFiltersChange={setFilters}
+        categories={categories}
+        isAdmin={true}
+        currentUser={null}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonthNum}
+        onYearChange={() => {}}
+        onMonthChange={() => {}}
+        onDeleteTransaction={deleteTransaction}
+        onUpdateTransaction={updateTransaction}
+        onAddTransaction={handleAddTransaction}
+        onAddCategory={addCategory}
+      />
+
+      <TransactionModals
+        showTransactionForm={showTransactionForm}
+        showTopCustomers={false}
+        showCustomerList={false}
+        transactionType={transactionType}
+        categories={categories}
+        filteredTransactions={filteredTransactions}
+        onCloseTransactionForm={() => setShowTransactionForm(false)}
+        onCloseTopCustomers={() => {}}
+        onCloseCustomerList={() => {}}
+        onAddTransaction={handleAddTransaction}
+        onAddCategory={addCategory}
+      />
+
+      <TransactionDetailDialog
+        transaction={newlyCreatedTransaction}
+        isOpen={showNewTransactionDetail}
+        onClose={() => {
+          setShowNewTransactionDetail(false);
+          setNewlyCreatedTransaction(null);
+        }}
+        isAdmin={true}
+        onDelete={deleteTransaction}
+      />
+    </>
+  );
+}
+
+// ─── Shared Reports View (wraps ReportsClean with MT data) ────────────────────
+/**
+ * MTGlassReportsView
+ * Renders the exact same Reports UI used by platform admin users,
+ * but fed with isolated company data from useMTTransactionAdapter.
+ */
+function MTGlassReportsView({
+  companyId,
+  currentUserEmail,
+}: {
+  companyId: string;
+  currentUserEmail?: string;
+}) {
+  const {
+    transactions,
+    categories,
+    loading,
+  } = useMTTransactionAdapter(companyId, ''); // empty selectedMonth fetches all transactions
+
+  return (
+    <ReportsLayout
+      transactions={transactions}
+      categories={categories}
+      loading={loading}
+      isCompanyView={true}
+      currentUser={currentUserEmail ? { email: currentUserEmail } : null}
+      hasSmartAnalysisAccess={currentUserEmail === 'jonahdjbreezy@gmail.com'}
+    />
+  );
+}
 
 // ─── Action Grid for Tenant Admin ─────────────────────────────────────────────
 interface ActionItem {
@@ -310,14 +462,14 @@ export function TenantAdminGlassDashboard() {
                 return <TenantAdminHomeView onViewChange={handleViewChange} onCashIn={() => handleViewChange('transactions')} onCashOut={() => handleViewChange('transactions')} companyId={companyId} />;
             case 'transactions':
                 return (
-                    <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
-                        <MTTransactionManager key={`mt-tx-${companyId}`} hideBalances={false} selectedMonth={selectedMonth} />
+                    <div className="animate-in fade-in duration-700">
+                        <MTGlassTransactionsView companyId={companyId} selectedMonth={selectedMonth} />
                     </div>
                 );
             case 'reports':
                 return (
                     <div className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 shadow-xl overflow-hidden animate-in fade-in duration-700">
-                        <Reports selectedMonth={selectedMonth} />
+                        <MTGlassReportsView companyId={companyId} currentUserEmail={auth?.user?.email} />
                     </div>
                 );
             case 'analytics':

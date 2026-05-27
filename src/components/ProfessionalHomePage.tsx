@@ -23,6 +23,7 @@ import { AnimatedProfilePicture } from '@/components/profile/AnimatedProfilePict
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { format } from 'date-fns';
 import { isRefundCategory } from '@/utils/refundUtils';
+import { useTenant } from '@/contexts/TenantContext';
 
 // Restricted users who cannot see Reports, Users, Settings tabs
 const RESTRICTED_EMAILS = [
@@ -68,6 +69,8 @@ export function ProfessionalHomePage({ onViewChange, onLogout }: ProfessionalHom
   const { currentUser, isAdmin, logout } = useAuth();
   const { systemState, loading: systemLoading } = useSystemBalance();
   const { transactions, loading: transactionsLoading } = useTransactions();
+  const { company } = useTenant();
+  const companyName = company?.name || 'Lighthouse';
 
   // Check if current user is restricted from seeing certain tabs
   const isRestrictedUser = currentUser?.email && RESTRICTED_EMAILS.includes(currentUser.email.toLowerCase());
@@ -216,7 +219,7 @@ export function ProfessionalHomePage({ onViewChange, onLogout }: ProfessionalHom
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Lighthouse Media
+                  {companyName}
                 </h1>
                 <p className="text-sm text-gray-600 font-medium">Professional Cash Flow Management</p>
               </div>
@@ -295,10 +298,10 @@ export function ProfessionalHomePage({ onViewChange, onLogout }: ProfessionalHom
                 </div>
                 <div className="text-left">
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-emerald-600 to-cyan-600 bg-clip-text text-transparent">
-                    Lighthouse Media
+                    {companyName}
                   </h1>
                   <p className="text-lg text-gray-600 font-medium">
-                    {currentUser ? `Welcome back, ${currentUser.username}!` : 'Welcome to Lighthouse Media Cashbook'}
+                    {currentUser ? `Welcome back, ${currentUser.username}!` : `Welcome to ${companyName} Cashbook`}
                   </p>
                 </div>
               </div>
@@ -353,7 +356,7 @@ export function ProfessionalHomePage({ onViewChange, onLogout }: ProfessionalHom
                   <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-600 rounded-lg flex items-center justify-center">
                     <PiggyBank className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold">Lighthouse Media</h3>
+                  <h3 className="text-xl font-bold">{companyName}</h3>
                 </div>
                 <p className="text-gray-400 mb-4">
                   Professional cash flow management system designed to help you take control of your finances and achieve your goals.
@@ -384,7 +387,7 @@ export function ProfessionalHomePage({ onViewChange, onLogout }: ProfessionalHom
 
             <div className="border-t border-gray-800 mt-8 pt-8 text-center">
               <p className="text-gray-400">
-                © 2024 Lighthouse Media. All rights reserved. • Professional Cash Flow Management
+              © 2024 {companyName}. All rights reserved. • Professional Cash Flow Management
               </p>
             </div>
           </div>

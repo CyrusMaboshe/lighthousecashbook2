@@ -76,7 +76,7 @@ export function TransactionDetailDialog({ transaction, isOpen, onClose, isAdmin,
 
     if (!transaction) return null;
 
-    const companyName = company?.name || 'Lighthouse Media';
+    const companyName = company?.name || 'Lighthouse';
     const companyLogo = company?.logo_url || '';
 
     // Guess payment method based on details
@@ -646,7 +646,7 @@ export function TransactionDetailDialog({ transaction, isOpen, onClose, isAdmin,
 
                                 {/* Footer Branding */}
                                 <div className="text-center text-[8px] font-bold tracking-[0.2em] text-slate-500 uppercase mt-1 relative z-10">
-                                    Powered by Lighthouse Cashbook
+                                    Powered by Smart Finance
                                 </div>
                             </div>
                         </div>

@@ -10,7 +10,10 @@ import { verifyUserPassword } from '@/services/passwordVerificationService';
 import { useToast } from '@/hooks/use-toast';
 import { MonthlyBalanceSummary } from '@/components/reports/MonthlyBalanceSummary';
 import { isRefundCategory } from '@/utils/refundUtils';
+import { SmartAnalysis } from '@/components/smart-analysis/SmartAnalysis';
+import { exportElementsToPDF } from '@/utils/universalChartExport';
 import {
+  Download,
   TrendingUp,
   TrendingDown,
   Wallet,
@@ -71,12 +74,24 @@ interface AllTimeStats {
 
 type ReportView = 'monthly' | 'progress' | 'smart' | 'alltime' | 'analytics';
 
-export function Reports() {
-  const { transactions, loading } = useTransactions();
-  const { currentUser } = useAuth();
-  const { toast } = useToast();
+interface ReportsLayoutProps {
+  transactions: any[];
+  categories?: string[];
+  loading: boolean;
+  isCompanyView?: boolean;
+  currentUser: { email?: string } | null;
+  hasSmartAnalysisAccess: boolean;
+}
 
-  const hasSmartAnalysisAccess = currentUser?.email === 'jonahdjbreezy@gmail.com';
+export function ReportsLayout({
+  transactions,
+  categories = [],
+  loading,
+  isCompanyView = false,
+  currentUser,
+  hasSmartAnalysisAccess,
+}: ReportsLayoutProps) {
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<ReportView>('monthly');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -259,6 +274,46 @@ export function Reports() {
     }
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const element = document.getElementById('glass-reports-container');
+      if (!element) {
+        toast({
+          title: "Export Failed",
+          description: "Could not find reports container element",
+          variant: "destructive"
+        });
+        return;
+      }
+      toast({
+        title: "Exporting Report",
+        description: "Preparing your PDF download...",
+      });
+      
+      const fileName = isCompanyView ? "Company_Financial_Report" : "Ecosystem_Financial_Report";
+      const headerTitle = isCompanyView ? "Company Financial Report" : "Ecosystem Financial Report";
+      
+      await exportElementsToPDF(
+        [element],
+        fileName,
+        undefined,
+        [headerTitle]
+      );
+      
+      toast({
+        title: "Export Successful",
+        description: "Your report has been downloaded.",
+      });
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "Export Failed",
+        description: "An error occurred during PDF generation.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-20 glass-card">
@@ -271,7 +326,7 @@ export function Reports() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div id="glass-reports-container" className="space-y-8 animate-in fade-in duration-700">
       {/* Premium Header */}
       <div className="glass-card overflow-hidden p-8 md:p-12 relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
@@ -285,21 +340,30 @@ export function Reports() {
                 <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none">Intelligence Hub</h1>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.25em] mt-2 flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                  Consolidated Business Analytics
+                  {isCompanyView ? 'Company Business Analytics' : 'Consolidated Business Analytics'}
                 </p>
               </div>
             </div>
           </div>
-          <Button
-            onClick={handleToggleBalances}
-            className={cn(
-              "glass-btn-primary h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-500",
-              balancesVisible ? "bg-red-500 shadow-red-500/20" : "bg-blue-600 shadow-blue-500/20"
-            )}
-          >
-            {balancesVisible ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-            {balancesVisible ? 'Restrict Data' : 'Authorize Insight'}
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={handleToggleBalances}
+              className={cn(
+                "glass-btn-primary h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-500",
+                balancesVisible ? "bg-red-500 shadow-red-500/20" : "bg-blue-600 shadow-blue-500/20"
+              )}
+            >
+              {balancesVisible ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+              {balancesVisible ? 'Restrict Data' : 'Authorize Insight'}
+            </Button>
+            <Button
+              onClick={handleExportPDF}
+              className="glass-btn-primary h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-500 bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export PDF
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -444,7 +508,7 @@ export function Reports() {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center md:text-left">
                 <div>
-                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">Total Ecosystem Revenue</p>
+                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">{isCompanyView ? 'Total Company Revenue' : 'Total Ecosystem Revenue'}</p>
                   <p className="text-5xl font-black text-white tracking-tighter tabular-nums mb-2">
                     {balancesVisible && allTimeStats ? <CountUp end={allTimeStats.totalCashIn} prefix="ZMW " /> : '********'}
                   </p>
@@ -458,11 +522,11 @@ export function Reports() {
                   <p className="text-xs text-slate-500 font-bold">Successfully processed protocols</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">Network Participants</p>
+                  <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">{isCompanyView ? 'Total Staff/Users' : 'Network Participants'}</p>
                   <p className="text-5xl font-black text-white tracking-tighter tabular-nums mb-2">
                     {allTimeStats ? <CountUp end={allTimeStats.totalUsers} decimals={0} /> : '0'}
                   </p>
-                  <p className="text-xs text-slate-500 font-bold">Verified administrative agents</p>
+                  <p className="text-xs text-slate-500 font-bold">{isCompanyView ? 'Verified staff members' : 'Verified administrative agents'}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] mb-4">Operational Surplus</p>
@@ -475,7 +539,7 @@ export function Reports() {
             </div>
 
             <div className="glass-card p-1">
-              <MonthlyBalanceSummary balancesVisible={balancesVisible} />
+              <MonthlyBalanceSummary balancesVisible={balancesVisible} transactions={transactions} />
             </div>
           </div>
         )}
@@ -497,12 +561,8 @@ export function Reports() {
         )}
 
         {currentView === 'smart' && hasSmartAnalysisAccess && (
-          <div className="glass-card p-20 text-center animate-in zoom-in-95 duration-700">
-            <Brain className="w-16 h-16 text-purple-500/50 mx-auto mb-6" />
-            <h3 className="text-2xl font-black text-white tracking-tighter mb-4">Artificial Intelligence Sandbox</h3>
-            <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em] max-w-md mx-auto leading-relaxed">
-              Legacy AI modules restricted to system architect only. Modern replacement under development.
-            </p>
+          <div className="animate-in slide-in-from-right-5 duration-700">
+            <SmartAnalysis transactions={transactions} />
           </div>
         )}
       </div>
@@ -537,5 +597,22 @@ export function Reports() {
         </div>
       )}
     </div>
+  );
+}
+
+export function Reports() {
+  const { transactions, loading } = useTransactions();
+  const { currentUser } = useAuth();
+
+  const hasSmartAnalysisAccess = currentUser?.email === 'jonahdjbreezy@gmail.com';
+
+  return (
+    <ReportsLayout
+      transactions={transactions}
+      loading={loading}
+      currentUser={currentUser}
+      isCompanyView={false}
+      hasSmartAnalysisAccess={hasSmartAnalysisAccess}
+    />
   );
 }
