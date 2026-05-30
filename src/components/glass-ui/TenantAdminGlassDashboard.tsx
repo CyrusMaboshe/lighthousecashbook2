@@ -39,7 +39,7 @@ import { ExportCenter } from '@/components/export/ExportCenter';
 import {
     Plus, Minus, Vault, BarChart3, MessageSquare, Users, Target, PiggyBank,
     FileText, Download, Receipt, Building2, ClipboardList, Wallet, LifeBuoy,
-    Activity, Settings, LayoutDashboard, TrendingUp, Sun, Moon
+    Activity, Settings, LayoutDashboard, TrendingUp, Sun, Moon, ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -217,7 +217,6 @@ function TenantAdminActionGrid({
         { id: 'targets', icon: Target, label: 'Milestones', subtitle: 'Goals', iconColor: 'text-cyan-400', view: 'targets' },
         { id: 'analytics', icon: BarChart3, label: 'Insights', subtitle: 'Analytics', iconColor: 'text-purple-400', view: 'analytics' },
         { id: 'reports', icon: FileText, label: 'Financials', subtitle: 'Reports', iconColor: 'text-blue-400', view: 'reports' },
-        { id: 'savings', icon: PiggyBank, label: 'Savings', subtitle: 'Company savings', iconColor: 'text-rose-400', view: 'savings' },
         { id: 'exports', icon: Download, label: 'Export Center', subtitle: 'Download data', iconColor: 'text-emerald-400', view: 'exports' },
         { id: 'logs', icon: Activity, label: 'Activity', subtitle: 'Logs', iconColor: 'text-slate-400', view: 'userlogs' },
         { id: 'settings', icon: Settings, label: 'Branding', subtitle: 'Settings', iconColor: 'text-slate-400', view: 'settings' },
@@ -579,6 +578,34 @@ export function TenantAdminGlassDashboard() {
                                             <p className="mt-3 text-[10px] text-slate-500 text-center">
                                                 Switches instantly across the entire app for multi-tenant users.
                                             </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Company Savings / Withdrawal access for multitenant admin */}
+                                    <div className="relative overflow-hidden rounded-2xl border border-rose-500/20 bg-gradient-to-br from-slate-900/80 via-rose-900/10 to-slate-900/60 backdrop-blur-xl shadow-xl">
+                                        <div className="absolute -top-8 -right-8 w-24 h-24 bg-rose-500/10 rounded-full blur-[30px] pointer-events-none" />
+                                        <div className="relative z-10 p-5">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-400/25 flex items-center justify-center shadow-inner">
+                                                    <PiggyBank className="w-4.5 h-4.5 text-rose-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[11px] font-black uppercase tracking-widest text-rose-300">Capital Reserve</p>
+                                                    <h3 className="text-base font-bold text-white leading-tight">Company Savings</h3>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-xs text-slate-400 mb-4">
+                                                Access the capital reserve and withdraw savings for {companyName}.
+                                            </p>
+
+                                            <Button
+                                                onClick={() => handleViewChange('savings')}
+                                                className="w-full bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-bold justify-between h-10 rounded-xl"
+                                            >
+                                                <span>Open Savings Vault</span>
+                                                <ChevronRight className="w-4 h-4" />
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>

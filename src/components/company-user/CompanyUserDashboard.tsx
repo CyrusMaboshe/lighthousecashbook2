@@ -149,36 +149,27 @@ export function CompanyUserDashboard() {
           setStatsLoading(true);
         }
 
-        // Load all-time stats (not filtered by month) for main dashboard
-        const { data: allTimeData, error: allTimeError } = await supabase
-          .from('mt_company_transactions')
-          .select('type, amount')
-          .eq('company_id', currentCompany.id);
+        // Load all-time stats using optimized RPC function
+        const { data: allTimeData, error: rpcError } = await supabase.rpc('get_mt_company_transaction_stats', {
+          p_company_id: currentCompany.id
+        });
 
-        if (allTimeError) {
-          console.error('Error loading all-time stats:', allTimeError);
+        if (rpcError) {
+          console.error('Error loading all-time stats via RPC:', rpcError);
           await loadStatsFallback();
-        } else {
-          const cashIn = allTimeData?.filter(t => t.type === 'cash-in') || [];
-          const cashOut = allTimeData?.filter(t => t.type === 'cash-out') || [];
-
-          const totalCashIn = cashIn.reduce((sum, t) => sum + (t.amount || 0), 0);
-          const totalCashOut = cashOut.reduce((sum, t) => sum + (t.amount || 0), 0);
-
+        } else if (allTimeData && allTimeData.length > 0) {
+          const res = allTimeData[0];
           setStats({
-            totalTransactions: allTimeData?.length || 0,
-            totalCashIn: totalCashIn,
-            totalCashOut: totalCashOut,
-            netBalance: totalCashIn - totalCashOut,
-            thisMonth: allTimeData?.length || 0
+            totalTransactions: Number(res.total_transactions) || 0,
+            totalCashIn: Number(res.total_cash_in) || 0,
+            totalCashOut: Number(res.total_cash_out) || 0,
+            netBalance: Number(res.net_balance) || 0,
+            thisMonth: Number(res.this_month_transactions) || 0
           });
 
-          console.log('📊 All-time stats loaded:', {
-            totalTransactions: allTimeData?.length || 0,
-            totalCashIn,
-            totalCashOut,
-            netBalance: totalCashIn - totalCashOut
-          });
+          console.log('📊 All-time stats loaded via RPC:', res);
+        } else {
+          await loadStatsFallback();
         }
       } catch (error) {
         console.error('Error loading stats:', error);
@@ -192,35 +183,64 @@ export function CompanyUserDashboard() {
     const loadStatsFallback = async () => {
       try {
         // Calculate date range for selected month
+        const [yearStr, monthStr] = selectedMonth.split('-');
         const startDate = `${selectedMonth}-01`;
-        const endDate = new Date(parseInt(selectedMonth.split('-')[0]), parseInt(selectedMonth.split('-')[1]), 0)
+        const endDate = new Date(parseInt(yearStr), parseInt(monthStr), 0)
           .toISOString().split('T')[0];
 
-        const { data, error } = await supabase
-          .from('mt_company_transactions')
-          .select('type, amount, date')
-          .eq('company_id', currentCompany.id)
-          .gte('date', startDate)
-          .lte('date', endDate);
+        // Try month-specific stats RPC first
+        const { data, error } = await supabase.rpc('get_mt_company_period_stats', {
+          p_company_id: currentCompany.id,
+          p_start_date: startDate,
+          p_end_date: endDate
+        });
 
         if (error) {
-          console.error('Error in stats fallback:', error);
+          console.warn('Error in stats fallback RPC, falling back to client-side aggregation:', error);
+          
+          // Fallback client-side calculation
+          const { data: rawData, error: rawError } = await supabase
+            .from('mt_company_transactions')
+            .select('type, amount, date')
+            .eq('company_id', currentCompany.id)
+            .gte('date', startDate)
+            .lte('date', endDate);
+
+          if (rawError) {
+            console.error('Error in raw stats fallback query:', rawError);
+            return;
+          }
+
+          const cashIn = rawData?.filter(t => t.type === 'cash-in') || [];
+          const cashOut = rawData?.filter(t => t.type === 'cash-out') || [];
+
+          const totalCashIn = cashIn.reduce((sum, t) => sum + (t.amount || 0), 0);
+          const totalCashOut = cashOut.reduce((sum, t) => sum + (t.amount || 0), 0);
+
+          setStats({
+            totalTransactions: rawData?.length || 0,
+            totalCashIn: totalCashIn,
+            totalCashOut: totalCashOut,
+            netBalance: totalCashIn - totalCashOut,
+            thisMonth: rawData?.length || 0
+          });
           return;
         }
 
-        const cashIn = data?.filter(t => t.type === 'cash-in') || [];
-        const cashOut = data?.filter(t => t.type === 'cash-out') || [];
-
-        const totalCashIn = cashIn.reduce((sum, t) => sum + (t.amount || 0), 0);
-        const totalCashOut = cashOut.reduce((sum, t) => sum + (t.amount || 0), 0);
-
-        setStats({
-          totalTransactions: data?.length || 0,
-          totalCashIn: totalCashIn,
-          totalCashOut: totalCashOut,
-          netBalance: totalCashIn - totalCashOut,
-          thisMonth: data?.length || 0
-        });
+        if (data && data.length > 0) {
+          const res = data[0];
+          setStats({
+            totalTransactions: Number(res.total_transactions) || 0,
+            totalCashIn: Number(res.total_cash_in) || 0,
+            totalCashOut: Number(res.total_cash_out) || 0,
+            netBalance: Number(res.net_balance) || 0,
+            thisMonth: Number(res.total_transactions) || 0
+          });
+        }
+      } catch (error) {
+        console.error('Error in stats fallback calculation:', error);
+      }
+    };
       } catch (error) {
         console.error('Error in stats fallback calculation:', error);
       }

@@ -268,33 +268,53 @@ export function CompanyAdminDashboardExact() {
       if (!currentCompany) return;
 
       try {
-        // Fetch all transactions for this company
-        const { data: transactions, error } = await supabase
-          .from('mt_company_transactions')
-          .select('*')
-          .eq('company_id', currentCompany.id);
+        // Query database stats directly
+        const { data, error } = await supabase.rpc('get_mt_company_transaction_stats', {
+          p_company_id: currentCompany.id
+        });
 
         if (error) {
-          console.error('Error loading company transactions:', error);
+          console.warn('Error loading company stats via RPC, falling back to client-side:', error);
+          
+          // Fallback to client-side loading
+          const { data: transactions, error: txError } = await supabase
+            .from('mt_company_transactions')
+            .select('type, amount, number_of_pictures')
+            .eq('company_id', currentCompany.id);
+
+          if (txError) {
+            console.error('Error loading fallback company transactions:', txError);
+            return;
+          }
+
+          const cashInTransactions = transactions?.filter(t => t.type === 'cash-in') || [];
+          const cashOutTransactions = transactions?.filter(t => t.type === 'cash-out') || [];
+
+          const totalCashIn = cashInTransactions.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+          const totalCashOut = cashOutTransactions.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+          const netBalance = totalCashIn - totalCashOut;
+          const totalPictures = cashInTransactions.reduce((sum, t) => sum + Number(t.number_of_pictures || 0), 0);
+
+          setStats({
+            totalCashIn,
+            totalCashOut,
+            netBalance,
+            totalPictures,
+            totalTransactions: transactions?.length || 0
+          });
           return;
         }
 
-        // Calculate real-time statistics
-        const cashInTransactions = transactions?.filter(t => t.type === 'cash-in') || [];
-        const cashOutTransactions = transactions?.filter(t => t.type === 'cash-out') || [];
-
-        const totalCashIn = cashInTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
-        const totalCashOut = cashOutTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
-        const netBalance = totalCashIn - totalCashOut;
-        const totalPictures = transactions?.filter(t => t.pictures && t.pictures > 0).reduce((sum, t) => sum + Number(t.pictures), 0) || 0;
-
-        setStats({
-          totalCashIn,
-          totalCashOut,
-          netBalance,
-          totalPictures,
-          totalTransactions: transactions?.length || 0
-        });
+        if (data && data.length > 0) {
+          const res = data[0];
+          setStats({
+            totalCashIn: Number(res.total_cash_in) || 0,
+            totalCashOut: Number(res.total_cash_out) || 0,
+            netBalance: Number(res.net_balance) || 0,
+            totalPictures: Number(res.total_pictures) || 0,
+            totalTransactions: Number(res.total_transactions) || 0
+          });
+        }
 
       } catch (error) {
         console.error('Error calculating company stats:', error);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GlassCard } from './GlassCard';
 import { GlassView } from './GlassAppShell';
-import { Settings, FileText, LogOut, ChevronRight, Shield, Edit2, User as UserIcon, Calendar, RotateCcw, Check } from 'lucide-react';
+import { Settings, FileText, LogOut, ChevronRight, Shield, Edit2, User as UserIcon, Calendar, RotateCcw, Check, PiggyBank } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -17,6 +17,7 @@ import { useGlobalMonthControl } from '@/hooks/useGlobalMonthControl';
 import { format } from 'date-fns';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTenant } from '@/contexts/TenantContext';
+import { useMultiTenantAuth } from '@/hooks/useSeparateMultiTenantAuth';
 
 interface ProfileMenuItem {
   id: string;
@@ -37,6 +38,8 @@ interface GlassProfileViewProps {
 export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewProps) {
   const { currentUser, isAdmin, refreshUserData } = useAuth();
   const { company } = useTenant();
+  const { currentCompany } = useMultiTenantAuth();
+  const isMTUser = !!company || !!currentCompany;
   const companyName = company?.name || 'Lighthouse';
   const { toast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -73,8 +76,26 @@ export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewPro
     { id: 'my-logs', icon: FileText, label: 'My Activity', subtitle: 'View your transaction history', view: 'userlogs' },
     { id: 'settings', icon: Settings, label: 'Settings', subtitle: 'App preferences and configuration', view: 'settings' },
     { id: 'admin-logs', icon: Shield, label: 'Admin Logs', subtitle: 'System administration logs', view: 'logs', adminOnly: true },
-    { id: 'logout', icon: LogOut, label: 'Logout', subtitle: 'Sign out of your account', action: onLogout, danger: true },
   ];
+
+  if (isMTUser) {
+    menuItems.push({
+      id: 'savings',
+      icon: PiggyBank,
+      label: 'Savings',
+      subtitle: 'Company savings and capital reserve',
+      view: 'savings'
+    });
+  }
+
+  menuItems.push({
+    id: 'logout',
+    icon: LogOut,
+    label: 'Logout',
+    subtitle: 'Sign out of your account',
+    action: onLogout,
+    danger: true
+  });
 
   const visibleItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 

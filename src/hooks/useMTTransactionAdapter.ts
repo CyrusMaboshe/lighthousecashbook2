@@ -90,11 +90,36 @@ export function useMTTransactionAdapter(
         .eq('company_id', companyId)
         .order('name');
       if (error) { console.error('useMTTransactionAdapter loadCategories:', error); return; }
+
+      // Self-healing: if empty, create default categories and reload
+      if (!data || data.length === 0) {
+        console.log('🌱 Adapter: No categories found, initializing defaults for company:', companyId);
+        const username = currentUser?.username || currentUser?.email || 'system';
+        const { error: rpcError } = await supabase.rpc('create_default_mt_company_categories', {
+          p_company_id: companyId,
+          p_created_by_username: username
+        });
+        if (rpcError) {
+          console.error('Adapter: Error initializing default categories:', rpcError);
+        } else {
+          // Re-fetch
+          const { data: reData, error: reError } = await supabase
+            .from('mt_company_categories')
+            .select('name')
+            .eq('company_id', companyId)
+            .order('name');
+          if (!reError && reData) {
+            setCategories(reData.map((c: any) => c.name));
+            return;
+          }
+        }
+      }
+
       setCategories((data || []).map((c: any) => c.name));
     } catch (err) {
       console.error('useMTTransactionAdapter loadCategories error:', err);
     }
-  }, [companyId]);
+  }, [companyId, currentUser]);
 
   const loadAll = useCallback(async () => {
     setLoading(true);

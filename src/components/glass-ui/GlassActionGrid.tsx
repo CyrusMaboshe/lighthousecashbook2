@@ -58,7 +58,13 @@ export function GlassActionGrid({
   ];
 
   const visibleActions = actions.filter(
-    a => !a.adminOnly || isAdmin || (a.id === 'savings' && !!companyId) || (a.id === 'exports' && !!companyId)
+    a => {
+      // For multitenant users (companyId is present), hide the savings button from the main grid
+      if (a.id === 'savings' && companyId) {
+        return false;
+      }
+      return !a.adminOnly || isAdmin || (a.id === 'exports' && !!companyId);
+    }
   );
 
   const getColorClasses = (iconColor: string) => {

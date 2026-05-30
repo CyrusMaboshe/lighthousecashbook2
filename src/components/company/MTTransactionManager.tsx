@@ -176,9 +176,11 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
     // Component will automatically re-render with new company data
   }, [currentCompany?.settings?.metric_name, currentCompany?.settings?.business_type, currentCompany?.settings?.primary_color, currentCompany?.logo_url]);
 
-  const loadData = async () => {
+  const loadData = async (isSilent = false) => {
     try {
-      setIsLoading(true);
+      if (!isSilent) {
+        setIsLoading(true);
+      }
       await Promise.all([
         loadTransactions(),
         loadCategories(),
@@ -192,7 +194,9 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      if (!isSilent) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -251,6 +255,30 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
         return;
       }
 
+      // Self-healing: if empty, create default categories and reload
+      if (!data || data.length === 0) {
+        console.log('🌱 No categories found, initializing defaults for company:', currentCompany.id);
+        const username = currentUser?.username || currentUser?.email || 'system';
+        const { error: rpcError } = await supabase.rpc('create_default_mt_company_categories', {
+          p_company_id: currentCompany.id,
+          p_created_by_username: username
+        });
+        if (rpcError) {
+          console.error('Error initializing default categories:', rpcError);
+        } else {
+          // Re-fetch categories
+          const { data: reData, error: reError } = await supabase
+            .from('mt_company_categories')
+            .select('*')
+            .eq('company_id', currentCompany.id)
+            .order('name');
+          if (!reError && reData) {
+            setCategories(reData);
+            return;
+          }
+        }
+      }
+
       setCategories(data || []);
     } catch (error) {
       console.error('Unexpected error loading categories:', error);
@@ -264,8 +292,58 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
         return;
       }
 
-      // Always use fallback for month-specific filtering
-      // The stored procedure doesn't support month filtering yet
+      if (selectedMonth) {
+        const [year, month] = selectedMonth.split('-');
+        const startDate = `${selectedMonth}-01`;
+        const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0];
+
+        const { data, error } = await supabase.rpc('get_mt_company_period_stats', {
+          p_company_id: currentCompany.id,
+          p_start_date: startDate,
+          p_end_date: endDate
+        });
+
+        if (error) {
+          console.error('Error calling get_mt_company_period_stats RPC:', error);
+          await loadStatsFallback();
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const res = data[0];
+          setStats({
+            total_cash_in: Number(res.total_cash_in) || 0,
+            total_cash_out: Number(res.total_cash_out) || 0,
+            net_balance: Number(res.net_balance) || 0,
+            total_pictures: Number(res.total_pictures) || 0,
+            total_transactions: Number(res.total_transactions) || 0
+          });
+          return;
+        }
+      } else {
+        const { data, error } = await supabase.rpc('get_mt_company_transaction_stats', {
+          p_company_id: currentCompany.id
+        });
+
+        if (error) {
+          console.error('Error calling get_mt_company_transaction_stats RPC:', error);
+          await loadStatsFallback();
+          return;
+        }
+
+        if (data && data.length > 0) {
+          const res = data[0];
+          setStats({
+            total_cash_in: Number(res.total_cash_in) || 0,
+            total_cash_out: Number(res.total_cash_out) || 0,
+            net_balance: Number(res.net_balance) || 0,
+            total_pictures: Number(res.total_pictures) || 0,
+            total_transactions: Number(res.total_transactions) || 0
+          });
+          return;
+        }
+      }
+
       await loadStatsFallback();
     } catch (error) {
       console.error('Unexpected error loading stats:', error);
@@ -346,9 +424,10 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
             console.log('🔄 Real-time change detected:', payload.eventType);
 
             // Only reload data if we're not currently submitting
+            // Only reload data if we're not currently submitting
             if (!isSubmittingCashIn && !isSubmittingCashOut) {
-              console.log('📊 Reloading data due to external change');
-              loadData();
+              console.log('📊 Reloading data silently due to external change');
+              loadData(true);
             } else {
               console.log('🚫 Skipping reload - submission in progress');
             }
@@ -395,8 +474,8 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
         description: `Category "${categoryName}" has been added successfully.`,
       });
 
-      // Reload categories
-      await loadData();
+      // Reload categories silently
+      await loadData(true);
 
       setManualCategoryName('');
       setShowManualCategoryInput(false);
@@ -531,10 +610,10 @@ export function MTTransactionManager({ selectedMonth, hideBalances: propHideBala
       });
       setShowCashInDialog(false);
 
-      // Force reload data after successful insertion
-      console.log('🔄 Reloading data after successful cash-in transaction...');
+      // Force reload data silently after successful insertion
+      console.log('🔄 Reloading data silently after successful cash-in transaction...');
       setTimeout(() => {
-        loadData();
+        loadData(true);
         console.log('✅ Data reload completed after cash-in');
       }, 1000);
 
