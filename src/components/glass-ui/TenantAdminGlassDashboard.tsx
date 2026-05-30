@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Button } from '@/components/ui/button';
 import './GlassTheme.css';
 
 // ─── Shared Transactions View (wraps GlassTransactionsView with MT data) ──────
