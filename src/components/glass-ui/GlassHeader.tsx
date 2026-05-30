@@ -8,6 +8,7 @@ interface GlassHeaderProps {
   onProfileClick?: () => void;
   showWelcome?: boolean;
   companyName?: string;
+  isCompanyUser?: boolean;
 }
 
 export function GlassHeader({
@@ -16,7 +17,8 @@ export function GlassHeader({
   onLogout,
   onProfileClick,
   showWelcome = false,
-  companyName = 'Lighthouse'
+  companyName = 'Lighthouse',
+  isCompanyUser = false
 }: GlassHeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -112,12 +114,14 @@ export function GlassHeader({
             </span>
           </button>
 
-          <button
-            onClick={onLogout}
-            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-rose-500/10 transition-all text-slate-500 hover:text-rose-400"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          {!isCompanyUser && (
+            <button
+              onClick={onLogout}
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-rose-500/10 transition-all text-slate-500 hover:text-rose-400"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 

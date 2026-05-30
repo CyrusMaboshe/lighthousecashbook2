@@ -408,6 +408,7 @@ export function GlassMainApp() {
         username={currentUser?.username}
         profilePictureUrl={currentUser?.profile_picture_url}
         onFabClick={handleFabClick}
+        isCompanyUser={isCompanyUser}
       >
         {renderView()}
       </GlassAppShell>

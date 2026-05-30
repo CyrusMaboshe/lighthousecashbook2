@@ -43,11 +43,13 @@ interface GlassAppShellProps {
   username?: string;
   profilePictureUrl?: string | null;
   onFabClick?: () => void;
+  isCompanyUser?: boolean;
 }
 
 export function GlassAppShell({
   children, currentView, onViewChange, onLogout, isAdmin,
-  companyName, username, profilePictureUrl, onFabClick
+  companyName, username, profilePictureUrl, onFabClick,
+  isCompanyUser = false
 }: GlassAppShellProps) {
   const [showFab, setShowFab] = useState(true);
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
@@ -98,6 +100,7 @@ export function GlassAppShell({
             onProfileClick={() => onViewChange('profile')}
             showWelcome={currentView === 'home'}
             companyName={companyName}
+            isCompanyUser={isCompanyUser}
           />
         </div>
 

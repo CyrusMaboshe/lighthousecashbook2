@@ -39,7 +39,8 @@ import { ExportCenter } from '@/components/export/ExportCenter';
 import {
     Plus, Minus, Vault, BarChart3, MessageSquare, Users, Target, PiggyBank,
     FileText, Download, Receipt, Building2, ClipboardList, Wallet, LifeBuoy,
-    Activity, Settings, LayoutDashboard, TrendingUp, Sun, Moon, ChevronRight
+    Activity, Settings, LayoutDashboard, TrendingUp, Sun, Moon, ChevronRight,
+    LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -609,6 +610,34 @@ export function TenantAdminGlassDashboard() {
                                             </Button>
                                         </div>
                                     </div>
+
+                                    {/* Logout Card */}
+                                    <div className="relative overflow-hidden rounded-2xl border border-red-500/20 bg-gradient-to-br from-slate-900/80 via-red-900/10 to-slate-900/60 backdrop-blur-xl shadow-xl">
+                                        <div className="absolute -top-8 -right-8 w-24 h-24 bg-red-500/10 rounded-full blur-[30px] pointer-events-none" />
+                                        <div className="relative z-10 p-5">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-400/25 flex items-center justify-center shadow-inner">
+                                                    <LogOut className="w-4.5 h-4.5 text-red-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[11px] font-black uppercase tracking-widest text-red-300">Session</p>
+                                                    <h3 className="text-base font-bold text-white leading-tight">Account</h3>
+                                                </div>
+                                            </div>
+
+                                            <p className="text-xs text-slate-400 mb-4">
+                                                Sign out of your session. You can sign back in at any time.
+                                            </p>
+
+                                            <Button
+                                                onClick={handleLogout}
+                                                className="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-bold justify-between h-10 rounded-xl"
+                                            >
+                                                <span>Logout</span>
+                                                <ChevronRight className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Right Column: Password Change */}
@@ -652,6 +681,7 @@ export function TenantAdminGlassDashboard() {
             username={username}
             profilePictureUrl={null}
             onFabClick={() => handleViewChange('transactions')}
+            isCompanyUser={true}
         >
             {renderView()}
         </GlassAppShell>

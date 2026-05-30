@@ -88,14 +88,16 @@ export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewPro
     });
   }
 
-  menuItems.push({
-    id: 'logout',
-    icon: LogOut,
-    label: 'Logout',
-    subtitle: 'Sign out of your account',
-    action: onLogout,
-    danger: true
-  });
+  if (!isMTUser) {
+    menuItems.push({
+      id: 'logout',
+      icon: LogOut,
+      label: 'Logout',
+      subtitle: 'Sign out of your account',
+      action: onLogout,
+      danger: true
+    });
+  }
 
   const visibleItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
@@ -479,6 +481,26 @@ export function GlassProfileView({ onViewChange, onLogout }: GlassProfileViewPro
           );
         })}
       </AppleControlList>
+ 
+      {isMTUser && (
+        <div className="pt-2">
+          <button
+            onClick={onLogout}
+            className="w-full py-4 px-5 rounded-2xl border border-red-500/20 bg-gradient-to-r from-red-950/20 to-slate-900/40 hover:from-red-900/35 hover:to-red-950/20 text-red-400 font-bold text-sm flex items-center justify-between transition-all duration-300 hover:border-red-500/40 hover:shadow-lg hover:shadow-red-500/10 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <LogOut className="w-4 h-4 text-red-400" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-white group-hover:text-red-400 transition-colors">Sign Out</p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Disconnect from your session</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-red-400" />
+          </button>
+        </div>
+      )}
 
       <GlassCard padding="sm" className="text-center">
         <p className="text-xs text-slate-500">{companyName} Cash Management v1.0</p>
