@@ -28,6 +28,7 @@ let globalLoading = true;
 let isFetching = false;
 let currentFetchPromise: Promise<Transaction[]> | null = null;
 let currentTenantId: string | null = undefined;
+let currentUserId: string | null = null;
 let currentRole: string | null = null;
 let currentIsOnline: boolean | null = null;
 
@@ -243,19 +244,27 @@ export const useTransactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>(globalTransactions);
   const [loading, setLoading] = useState<boolean>(globalLoading);
 
-  // Sync latest hook state inputs with global tracker
-  currentTenantId = tenantId;
-  currentRole = role;
-  currentIsOnline = isOnline;
+  // Sync latest hook state inputs with global tracker (moved to useEffect to correctly detect change)
+  const userChanged = currentUser?.id !== currentUserId;
+  const isTenantChanged = tenantId !== currentTenantId || userChanged;
 
   useEffect(() => {
-    // If tenant context has changed, flush previous cache
-    const isTenantChanged = tenantId !== currentTenantId;
+    // If tenant or user context has changed, flush previous cache
     if (isTenantChanged) {
+      console.log(`🔄 Tenant/User context changed. Flushing transaction cache. Previous tenant: ${currentTenantId}, New tenant: ${tenantId}. Previous user: ${currentUserId}, New user: ${currentUser?.id}`);
       currentTenantId = tenantId;
+      currentUserId = currentUser?.id || null;
       globalTransactions = [];
       globalLoading = true;
+      
+      // Clear sessionStorage cache to prevent leakage
+      const cacheKey = `transactions_tenant_${tenantId || 'all'}_v2`;
+      sessionStorage.removeItem(cacheKey);
+      sessionStorage.removeItem(`${cacheKey}_time`);
     }
+
+    currentRole = role;
+    currentIsOnline = isOnline;
 
     const subscriber = (data: { transactions: Transaction[]; loading: boolean }) => {
       setTransactions(data.transactions);
@@ -279,7 +288,7 @@ export const useTransactions = () => {
         cleanupGlobalRealtime();
       }
     };
-  }, [tenantId, role, isOnline]);
+  }, [tenantId, role, isOnline, currentUser?.id]);
 
   const getOrCreateCategory = async (categoryName: string): Promise<string | null> => {
     try {

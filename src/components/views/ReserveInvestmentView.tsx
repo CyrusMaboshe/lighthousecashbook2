@@ -548,8 +548,6 @@ function AdminReservePanel({
         });
         setEditTxOpen(true);
     };
-
-    // Edit a withdrawal record — recalculates allocation.total_withdrawn
     const handleSaveTx = async () => {
         if (!editingTx) return;
         const newAmount = parseFloat(txEditForm.amount);
@@ -559,57 +557,19 @@ function AdminReservePanel({
         }
         setSavingTx(true);
         try {
-            const oldAmount = editingTx.amount;
-            const oldDate = editingTx.date;
-            const diff = newAmount - oldAmount; // positive = increase, negative = decrease
+            const { data, error: rpcErr } = await supabase.rpc('update_reserve_withdrawal', {
+                p_withdrawal_id: editingTx.id,
+                p_new_amount: newAmount,
+                p_new_description: txEditForm.description || '',
+                p_new_date: txEditForm.date || editingTx.date,
+                p_username: currentUser?.username || 'admin',
+                p_user_id: currentUser?.id || '00000000-0000-0000-0000-000000000000'
+            });
 
-            // 1. Update the withdrawal record itself
-            const { error: wErr } = await supabase
-                .from('reserve_investment_withdrawals' as any)
-                .update({
-                    amount: newAmount,
-                    description: txEditForm.description || editingTx.description,
-                    date: txEditForm.date || editingTx.date,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('id', editingTx.id);
-            if (wErr) throw wErr;
-
-            // 2. Recalculate affected allocation.total_withdrawn
-            if (editingTx.allocation_id && diff !== 0) {
-                // Fetch current allocation total_withdrawn
-                const { data: allocData } = await supabase
-                    .from('reserve_investment_allocations' as any)
-                    .select('total_withdrawn')
-                    .eq('id', editingTx.allocation_id)
-                    .single();
-                if (allocData) {
-                    const newTotal = Math.max(0, (allocData as any).total_withdrawn + diff);
-                    await supabase
-                        .from('reserve_investment_allocations' as any)
-                        .update({ total_withdrawn: newTotal, updated_at: new Date().toISOString() })
-                        .eq('id', editingTx.allocation_id);
-                }
+            if (rpcErr) throw rpcErr;
+            if (data && !data.success) {
+                throw new Error(data.message || 'Database update failed');
             }
-
-            // 3. Update main transaction history entry for parity
-            // Match the old record and update with new values
-            const { error: tErr } = await supabase
-                .from('transactions')
-                .update({
-                    amount: newAmount,
-                    date: txEditForm.date || editingTx.date,
-                    details: txEditForm.description ? `Reserve Investment cash-out: ${txEditForm.description}` : `Reserve Investment cash-out update.`,
-                })
-                .match({
-                    type: 'cash-out',
-                    amount: oldAmount,
-                    customer_name: editingTx.user_display_name,
-                    date: oldDate
-                })
-                .ilike('details', '%Reserve Investment%');
-            
-            if (tErr) console.error('[Reserve] Update main transactions error:', tErr);
 
             toast({ title: '✅ Transaction Updated', description: `Withdrawal record updated and history synchronized.` });
             setEditTxOpen(false);
@@ -637,92 +597,16 @@ function AdminReservePanel({
             setDeletedIds(prev => new Set(Array.from(prev).concat(tx.id)));
             setAllWithdrawals(prev => prev.filter(w => w.id !== tx.id));
 
-            // ── Step 1: Remove the primary withdrawal record ──
-            const { error: dErr } = await supabase
-                .from('reserve_investment_withdrawals' as any)
-                .delete()
-                .eq('id', tx.id);
-            
-            if (dErr) {
-                console.error('[Reserve] Delete withdrawal record error:', dErr);
-                // Rollback optimistic update if the DB delete fails
-                await loadAllWithdrawals();
-                throw dErr;
+            const { data, error: rpcErr } = await supabase.rpc('reverse_reserve_withdrawal', {
+                p_withdrawal_id: tx.id,
+                p_username: currentUser?.username || 'admin',
+                p_user_id: currentUser?.id || '00000000-0000-0000-0000-000000000000'
+            });
+
+            if (rpcErr) throw rpcErr;
+            if (data && !data.success) {
+                throw new Error(data.message || 'Database deletion failed');
             }
-
-            // ── Step 2: Restore Global Reserve Total in config ──
-            const { data: configData } = await supabase
-                .from('reserve_investment_config' as any)
-                .select('total_reserve')
-                .eq('id', companyId || 'singleton')
-                .single();
-            
-            if (configData) {
-                const refreshedConfigTotal = (configData as any).total_reserve + tx.amount;
-                await supabase
-                    .from('reserve_investment_config' as any)
-                    .update({ 
-                        total_reserve: refreshedConfigTotal, 
-                        updated_at: new Date().toISOString() 
-                    })
-                    .eq('id', companyId || 'singleton');
-                console.log('[Reserve] Restored global total');
-            }
-
-            // ── Step 3: Reverse on allocation.total_withdrawn ──
-            if (tx.allocation_id) {
-                const { data: allocData } = await supabase
-                    .from('reserve_investment_allocations' as any)
-                    .select('total_withdrawn')
-                    .eq('id', tx.allocation_id)
-                    .single();
-                
-                if (allocData) {
-                    const currentWithdrawn = (allocData as any).total_withdrawn || 0;
-                    const restored = Math.max(0, currentWithdrawn - tx.amount);
-                    
-                    await supabase
-                        .from('reserve_investment_allocations' as any)
-                        .update({ total_withdrawn: restored, updated_at: new Date().toISOString() })
-                        .eq('id', tx.allocation_id);
-                    console.log('[Reserve] Restored allocation balance');
-                }
-            }
-
-            // ── Step 4: Purge from main transactions table (Sync Parity) ──
-            const txTable = companyId ? 'mt_company_transactions' : 'transactions';
-            const compQuery = companyId ? (q: any) => q.eq('company_id', companyId) : (q: any) => q;
-
-            await compQuery(supabase
-                .from(txTable as any)
-                .delete()
-                .eq('amount', tx.amount)
-                .eq('date', tx.date)
-                .eq('category_name', 'Reserve Investment Withdrawal'));
-                
-            await compQuery(supabase
-                .from(txTable as any)
-                .delete()
-                .eq('amount', tx.amount)
-                .eq('date', tx.date)
-                .ilike('details', '%Reserve Investment%'));
-
-            // ── Step 5: Purge from savings_transactions table (Savings Parity) ──
-            const purgeSavingsQuery = supabase
-                .from('savings_transactions')
-                .delete()
-                .match({
-                    action_type: 'withdrawal',
-                    amount: tx.amount,
-                    date: tx.date
-                });
-                
-            if (companyId) {
-                await purgeSavingsQuery.eq('tenant_id', companyId);
-            } else {
-                await purgeSavingsQuery;
-            }
-
 
             toast({ 
                 title: '🗑️ Withdrawal Fully Purged', 
@@ -2156,99 +2040,22 @@ function UserReservePanel({
                 const withdrawFromThis = Math.round(Math.min(remainingToWithdraw, allocRemaining) * 100) / 100;
                 if (withdrawFromThis <= 0) continue;
 
-                // Determine new total_withdrawn for this allocation row
-                const currentAllocWithdrawn = alloc.total_withdrawn || 0;
-                const newTotalWithdrawn = currentAllocWithdrawn + withdrawFromThis;
+                // Call the execute_reserve_withdrawal RPC to perform the split-deduction atomically in the database
+                const { data, error: rpcErr } = await supabase.rpc('execute_reserve_withdrawal', {
+                    p_alloc_id: alloc.id,
+                    p_amount: withdrawFromThis,
+                    p_username: username,
+                    p_user_id: currentUser?.id || '00000000-0000-0000-0000-000000000000',
+                    p_today_date: today,
+                    p_description: withdrawDescription || 'Reserve Investment Withdrawal'
+                });
 
-                // 1. Insert reserve withdrawal record
-                const { error: wErr } = await supabase
-                    .from('reserve_investment_withdrawals' as any)
-                    .insert({
-                        user_id: alloc.user_id,
-                        user_display_name: alloc.user_display_name,
-                        allocation_id: alloc.id,
-                        amount: withdrawFromThis,
-                        balance_before: allocRemaining,
-                        balance_after: allocRemaining - withdrawFromThis,
-                        description: withdrawDescription || 'Reserve Investment Withdrawal',
-                        date: today,
-                    });
-                if (wErr) throw wErr;
-
-                // 2. Update allocation.total_withdrawn
-                const { error: uErr } = await supabase
-                    .from('reserve_investment_allocations' as any)
-                    .update({ total_withdrawn: newTotalWithdrawn, updated_at: new Date().toISOString() })
-                    .eq('id', alloc.id);
-                if (uErr) throw uErr;
+                if (rpcErr) throw rpcErr;
+                if (data && !data.success) {
+                    throw new Error(data.message || 'Database execution failed');
+                }
 
                 remainingToWithdraw -= withdrawFromThis;
-            }
-
-            // 3. Deduct from Global Reserve Total in config
-            const { error: cErr } = await supabase
-                .from('reserve_investment_config' as any)
-                .update({ 
-                    total_reserve: totalReserve - amount,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', companyId || 'singleton');
-            if (cErr) console.error('[Reserve] Global total sync error:', cErr);
-
-            // 4. Record in main transaction history (Dashboard totals)
-            const txTable = companyId ? 'mt_company_transactions' : 'transactions';
-            const mainTxPayload: any = {
-                type: 'cash-out',
-                category_name: 'Reserve Investment Withdrawal',
-                customer_name: username,
-                amount,
-                added_by: username,
-                added_by_user_id: currentUser?.id || '00000000-0000-0000-0000-000000000000',
-                date: today,
-                details: `Reserve Investment cash-out: ${withdrawDescription || 'Personal withdrawal'}.`,
-            };
-            if (companyId) {
-                mainTxPayload.company_id = companyId;
-                mainTxPayload.time = format(new Date(), 'HH:mm');
-            }
-            const { error: tErr } = await supabase
-                .from(txTable as any)
-                .insert(mainTxPayload);
-            if (tErr) console.error('[Reserve] Main history sync error:', tErr);
-
-            // 5. Deduct from persistent savings pool (Savings totals)
-            const savingsTxPayload: any = {
-                action_type: 'withdrawal',
-                amount,
-                description: `Reserve Investment: ${withdrawDescription || 'Withdrawal'} - ${username}`,
-                initiating_user: username,
-                initiating_user_id: currentUser?.id || null,
-                balance_before: availableToWithdraw,
-                balance_after: availableToWithdraw - amount,
-                date: today,
-                user_id: currentUser?.id || null,
-            };
-            if (companyId) {
-                savingsTxPayload.tenant_id = companyId;
-                savingsTxPayload.time = format(new Date(), 'HH:mm');
-            }
-            const { error: sErr } = await supabase
-                .from('savings_transactions')
-                .insert(savingsTxPayload);
-            if (sErr) console.error('[Reserve] Savings sync error:', sErr);
-
-            // 6. Update savings balance for company
-            if (companyId) {
-                const { error: uErr } = await supabase
-                    .from('savings_balance')
-                    .upsert({
-                        tenant_id: companyId,
-                        current_balance: availableToWithdraw - amount,
-                        updated_by: username,
-                        updated_by_user_id: currentUser?.id || null,
-                        last_updated: new Date().toISOString()
-                    }, { onConflict: 'tenant_id' });
-                if (uErr) console.error('[Reserve] Savings balance update error:', uErr);
             }
 
             toast({ title: '✅ Withdrawal Successful', description: `ZMW ${amount.toFixed(2)} withdrawn. All system totals updated.` });
